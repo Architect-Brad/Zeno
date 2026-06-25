@@ -1,0 +1,35 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.backends._legacy:_Backend"
+
+[project]
+name = "zeno"
+version = "1.0.0"
+description = "On-device voice assistant — semantic NLU, cross-platform, zero cloud"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "The Architect"},
+]
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+web = [
+    "fastapi>=0.99,<1",
+    "uvicorn[standard]",
+    "websockets",
+]
+weather = [
+    "httpx",
+]
+test = [
+    "pytest",
+    "httpx",
+]
+
+[tool.setuptools.packages.find]
+include = ["zeno*"]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]

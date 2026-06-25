@@ -12,6 +12,7 @@ from zeno.skills.reminders import ReminderSkill
 from zeno.skills.system import SystemSkill
 from zeno.skills.calculator import CalculatorSkill
 from zeno.skills.weather import WeatherSkill
+from zeno.skills.news import NewsSkill
 from zeno.response.engine import pick
 
 # Cosine similarity scores range ~0.0–0.8; 0.25 is a good floor
@@ -27,6 +28,7 @@ _SKILLS = [
     SystemSkill(),
     CalculatorSkill(),
     WeatherSkill(),
+    NewsSkill(),
 ]
 
 _INTENT_MAP: dict[str, object] = {}
