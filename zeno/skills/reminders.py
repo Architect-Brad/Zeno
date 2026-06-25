@@ -14,6 +14,7 @@ from zeno.platform import show_notification, caps, vibrate
 class ReminderSkill(BaseSkill):
     intents = ["set_alarm", "set_timer", "set_reminder"]
     _active_timers: list[threading.Timer] = []
+    _timer_meta: list[dict] = []  # metadata for web UI
 
     def handle(self, intent: str, entities: Entities, context: Context) -> str:
         if intent == "set_alarm":
@@ -131,6 +132,8 @@ class ReminderSkill(BaseSkill):
         )
 
     def _schedule_timer(self, seconds: int, label: str, is_alarm: bool = False):
+        started = time.time()
+
         def fire():
             if is_alarm:
                 show_notification("Zeno Alarm", f"⏰ {label}", alert_once=False)
@@ -142,6 +145,27 @@ class ReminderSkill(BaseSkill):
         timer.daemon = True
         timer.start()
         self._active_timers.append(timer)
+        self._timer_meta.append({
+            "label": label,
+            "seconds": seconds,
+            "started": started,
+            "is_alarm": is_alarm,
+        })
 
     def _schedule_reminder(self, subject: str):
         show_notification("Zeno Reminder", f"📌 Don't forget: {subject}")
+
+    @staticmethod
+    def list_timers() -> list[dict]:
+        import datetime
+        now = datetime.datetime.now()
+        result = []
+        for t in ReminderSkill._active_timers:
+            remaining = max(0, t.interval - (time.time() - (t.finished_at if hasattr(t, 'finished_at') else 0)))
+            if hasattr(t, 'func') and t.is_alive():
+                result.append({
+                    "remaining": remaining,
+                    "interval": t.interval,
+                    "alive": t.is_alive(),
+                })
+        return result

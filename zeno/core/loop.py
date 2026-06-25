@@ -1,11 +1,12 @@
 """
 Zeno Core Loop
 Orchestrates NLU → Skills → Response for each user turn.
-Handles multi-turn slot-filling and confidence thresholds.
+Handles multi-turn slot-filling, confidence thresholds, and plugin auto-discovery.
 """
 
 from zeno.nlu.pipeline import process as nlu_process, NLUResult
 from zeno.core.context import Context
+from zeno.core.plugins import load_plugins
 from zeno.skills.time_skill import TimeSkill
 from zeno.skills.conversation import ConversationSkill
 from zeno.skills.reminders import ReminderSkill
@@ -15,13 +16,12 @@ from zeno.skills.weather import WeatherSkill
 from zeno.skills.news import NewsSkill
 from zeno.response.engine import pick
 
-# Cosine similarity scores range ~0.0–0.8; 0.25 is a good floor
 CONFIDENCE_THRESHOLD = 0.30
 
 _conversation_skill = ConversationSkill()
 _reminder_skill = ReminderSkill()
 
-_SKILLS = [
+_BUILTIN_SKILLS = [
     TimeSkill(),
     _conversation_skill,
     _reminder_skill,
@@ -31,19 +31,29 @@ _SKILLS = [
     NewsSkill(),
 ]
 
-_INTENT_MAP: dict[str, object] = {}
-for skill in _SKILLS:
-    for intent in skill.intents:
-        _INTENT_MAP[intent] = skill
+_PLUGIN_SKILLS: list = []
 
-_SLOT_OWNERS: dict[str, object] = {
-    "set_alarm": _reminder_skill,
-    "set_timer": _reminder_skill,
-    "set_reminder": _reminder_skill,
-    "introduce": _conversation_skill,
-}
+
+def _rebuild():
+    global _INTENT_MAP, _SLOT_OWNERS, _SKILLS, _PLUGIN_SKILLS
+    _PLUGIN_SKILLS = load_plugins()
+    _SKILLS = _BUILTIN_SKILLS + _PLUGIN_SKILLS
+    _INTENT_MAP = {}
+    for skill in _SKILLS:
+        for intent in skill.intents:
+            _INTENT_MAP[intent] = skill
+    _SLOT_OWNERS = {
+        "set_alarm": _reminder_skill,
+        "set_timer": _reminder_skill,
+        "set_reminder": _reminder_skill,
+        "introduce": _conversation_skill,
+    }
+
 
 _OVERRIDE_INTENTS = {"cancel", "farewell"}
+
+# Build on first import
+_rebuild()
 
 
 def process_input(text: str, context: Context) -> str:

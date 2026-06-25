@@ -342,17 +342,155 @@ class IntentClassifier:
         return sorted(scores.items(), key=lambda x: -x[1])[:top_n]
 
 
+# ---------------------------------------------------------------------------
+# Multi-language support — translated training data
+# ---------------------------------------------------------------------------
+
+LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
+    "es": {
+        "greeting": ["hola", "buenos días", "buenas tardes", "buenas noches", "hey", "qué tal", "saludos", "hola zeno"],
+        "farewell": ["adiós", "hasta luego", "nos vemos", "cuídate", "bye", "hasta pronto"],
+        "time_query": ["qué hora es", "qué hora tienes", "dime la hora", "hora actual", "me das la hora"],
+        "date_query": ["qué día es hoy", "qué fecha es", "dime la fecha", "fecha actual"],
+        "weather_query": ["qué tiempo hace", "cómo está el clima", "va a llover", "temperatura", "clima"],
+        "set_alarm": ["pon una alarma", "despiértame a las", "alarma para", "necesito una alarma"],
+        "set_timer": ["pon un temporizador", "temporizador de", "cuenta atrás", "temporizador para"],
+        "set_reminder": ["recuérdame", "pon un recordatorio", "no me olvides", "recordatorio"],
+        "thanks": ["gracias", "muchas gracias", "te agradezco", "gracias totales"],
+        "affirm": ["sí", "si", "claro", "vale", "ok", "de acuerdo", "correcto"],
+        "deny": ["no", "nunca", "para nada", "no gracias", "no quiero"],
+        "cancel": ["cancelar", "olvídalo", "cancela eso", "no importa"],
+        "identity_query": ["quién eres", "qué eres", "cómo te llamas", "qué puedes hacer"],
+    },
+    "fr": {
+        "greeting": ["bonjour", "salut", "bonsoir", "coucou", "hello", "salut zeno"],
+        "farewell": ["au revoir", "à bientôt", "ciao", "salut", "bonne journée"],
+        "time_query": ["quelle heure est-il", "donne-moi l'heure", "l'heure actuelle"],
+        "date_query": ["quel jour sommes-nous", "quelle est la date", "date d'aujourd'hui"],
+        "weather_query": ["quel temps fait-il", "météo", "va-t-il pleuvoir", "température"],
+        "set_alarm": ["mets un réveil", "réveille-moi à", "alarme pour", "je besoin d'un réveil"],
+        "set_timer": ["mets un minuteur", "minuteur de", "compte à rebours"],
+        "set_reminder": ["rappelle-moi", "mets un rappel", "n'oublie pas de"],
+        "thanks": ["merci", "merci beaucoup", "je te remercie"],
+        "affirm": ["oui", "d'accord", "ok", "bien sûr", "exact"],
+        "deny": ["non", "jamais", "pas du tout", "non merci"],
+        "cancel": ["annuler", "oublie ça", "annule ça"],
+        "identity_query": ["qui es-tu", "que es-tu", "comment tu t'appelles"],
+    },
+    "de": {
+        "greeting": ["hallo", "guten morgen", "guten tag", "guten abend", "servus", "hallo zeno", "moin"],
+        "farewell": ["tschüss", "auf wiedersehen", "bis später", "mach's gut", "ciao"],
+        "time_query": ["wie spät ist es", "wie viel uhr", "aktuelle zeit", "hast du die uhrzeit"],
+        "date_query": ["welcher tag ist heute", "welches datum", "heutiges datum"],
+        "weather_query": ["wie ist das wetter", "wetter", "regnet es", "temperatur"],
+        "set_alarm": ["stell einen wecker", "weck mich um", "alarm für", "ich brauche einen wecker"],
+        "set_timer": ["stell einen timer", "timer für", "countdown", "zeitmesser für"],
+        "set_reminder": ["erinnere mich", "mach eine erinnerung", "vergiss nicht"],
+        "thanks": ["danke", "vielen dank", "danke schön"],
+        "affirm": ["ja", "genau", "okay", "klar", "richtig"],
+        "deny": ["nein", "nie", "gar nicht", "nein danke"],
+        "cancel": ["abbrechen", "vergiss es", "storno"],
+        "identity_query": ["wer bist du", "was bist du", "wie heißt du"],
+    },
+    "hi": {
+        "greeting": ["नमस्ते", "नमस्कार", "हैलो", "क्या हाल है", "हेलो ज़ेनो"],
+        "farewell": ["अलविदा", "फिर मिलेंगे", "नमस्ते", "चलता हूँ"],
+        "time_query": ["कितने बजे हैं", "समय क्या हुआ", "क्या समय है", "टाइम बताओ"],
+        "date_query": ["आज कौन सी तारीख है", "आज क्या दिन है", "डेट बताओ"],
+        "weather_query": ["मौसम कैसा है", "क्या मौसम है", "बारिश होगी क्या"],
+        "set_alarm": ["अलार्म लगाओ", "मुझे जगाओ", "अलार्म सेट करो"],
+        "set_timer": ["टाइमर लगाओ", "टाइमर सेट करो", "गिनती शुरू करो"],
+        "set_reminder": ["मुझे याद दिलाना", "रिमाइंडर लगाओ", "भूलना मत"],
+        "thanks": ["धन्यवाद", "शुक्रिया", "थैंक्यू"],
+        "affirm": ["हाँ", "जी हाँ", "ठीक है", "बिल्कुल"],
+        "deny": ["नहीं", "जी नहीं", "कभी नहीं"],
+        "cancel": ["रद्द करो", "भूल जाओ", "कैंसल करो"],
+        "identity_query": ["तुम कौन हो", "तुम क्या हो", "आप कौन हैं"],
+    },
+}
+
+
+def detect_language(text: str) -> str:
+    """
+    Heuristic language detection from Unicode ranges.
+    Returns 'hi' for Devanagari, 'zh' for CJK, 'ar' for Arabic, 'en' as fallback.
+    """
+    for ch in text:
+        cp = ord(ch)
+        if 0x0900 <= cp <= 0x097F:
+            return "hi"
+        if 0x4E00 <= cp <= 0x9FFF or 0x3400 <= cp <= 0x4DBF:
+            return "zh"
+        if 0x0600 <= cp <= 0x06FF:
+            return "ar"
+        if 0x0400 <= cp <= 0x04FF:
+            return "ru"
+    return "en"
+
+
+def _merge_language_data(base: dict, lang: str) -> dict:
+    extra = LANGUAGE_PHRASES.get(lang, {})
+    if not extra:
+        return base
+    merged = {}
+    for intent, phrases in base.items():
+        merged[intent] = phrases + extra.get(intent, [])
+    for intent, phrases in extra.items():
+        if intent not in merged:
+            merged[intent] = phrases
+    return merged
+
+
 # Module-level singleton
 _classifier: IntentClassifier | None = None
+_current_language: str = "auto"
+_all_langs_merged: dict[str, list[str]] | None = None
 
 
-def get_classifier() -> IntentClassifier:
-    global _classifier
-    if _classifier is None:
+def _build_merged() -> dict[str, list[str]]:
+    """Merge ALL language data into one giant training set."""
+    merged = dict(TRAINING_DATA)
+    for lang_data in LANGUAGE_PHRASES.values():
+        for intent, phrases in lang_data.items():
+            if intent in merged:
+                merged[intent] = list(set(merged[intent] + phrases))
+            else:
+                merged[intent] = phrases
+    return merged
+
+
+def get_classifier(language: str | None = None) -> IntentClassifier:
+    global _classifier, _current_language, _all_langs_merged
+    lang = language or _current_language
+
+    if _classifier is not None and lang == _current_language:
+        return _classifier
+
+    if lang == "auto":
+        if _all_langs_merged is None:
+            _all_langs_merged = _build_merged()
         _classifier = IntentClassifier()
-        _classifier.fit()
+        _classifier.fit(_all_langs_merged)
+    else:
+        data = _merge_language_data(TRAINING_DATA, lang)
+        _classifier = IntentClassifier()
+        _classifier.fit(data)
+
+    _current_language = lang
     return _classifier
 
 
+def set_language(lang: str):
+    """Set the language for intent classification (en, es, fr, de, hi, auto)."""
+    if lang in LANGUAGE_PHRASES or lang in ("en", "auto"):
+        get_classifier(lang)
+
+
 def classify_intent(text: str, context_intent: str | None = None) -> IntentResult:
-    return get_classifier().predict(text, context_intent=context_intent)
+    if _current_language == "auto":
+        lang = "auto"
+    elif _current_language == "en":
+        lang = detect_language(text)
+    else:
+        lang = _current_language
+    return get_classifier(lang).predict(text, context_intent=context_intent)

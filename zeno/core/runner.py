@@ -105,8 +105,9 @@ if __name__ == "__main__":
     args = set(sys.argv[1:])
     wake = "--wake" in args or "-w" in args
     voice = "--voice" in args or "-v" in args
+    continuous = "--continuous" in args or "-c" in args
 
-    if voice or wake:
+    if continuous or voice or wake:
         asyncio.run(run_voice_loop(require_wake=wake))
     else:
         run_text_loop()

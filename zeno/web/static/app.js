@@ -225,6 +225,79 @@
     }
   }
 
+  // ---------- Timers Panel ----------
+
+  let timersInterval = null;
+
+  const DOM_T = {
+    panel: document.getElementById('timers-panel'),
+    btn: document.getElementById('btn-timers'),
+    close: document.getElementById('btn-close-timers'),
+    list: document.getElementById('timers-list'),
+  };
+
+  async function refreshTimers() {
+    try {
+      const res = await fetch('/api/timers');
+      const data = await res.json();
+      const timers = data.timers || [];
+      DOM_T.list.innerHTML = '';
+
+      if (timers.length === 0) {
+        DOM_T.list.innerHTML = '<div class="setting-info">No active timers or alarms.</div>';
+        return;
+      }
+
+      for (const t of timers) {
+        const card = document.createElement('div');
+        card.className = 'timer-card';
+        card.dataset.id = t.id;
+        card.dataset.remaining = t.remaining;
+        card.dataset.total = t.total;
+
+        const pct = t.total > 0 ? ((t.total - t.remaining) / t.total * 100) : 0;
+        const mins = Math.floor(t.remaining / 60);
+        const secs = t.remaining % 60;
+        const timeStr = mins > 0 ? `${mins}m ${secs}s` : `${secs}s`;
+
+        card.innerHTML = `
+          <div class="timer-label">${t.is_alarm ? '⏰' : '⏱'} ${t.label}</div>
+          <div class="timer-remaining">${timeStr}</div>
+          <div class="timer-bar"><div class="timer-bar-fill" style="width:${pct}%"></div></div>
+          <button class="timer-cancel" data-id="${t.id}">Cancel</button>
+        `;
+
+        card.querySelector('.timer-cancel').addEventListener('click', async () => {
+          await fetch(`/api/timers/${t.id}/cancel`, { method: 'POST' });
+          refreshTimers();
+        });
+
+        DOM_T.list.appendChild(card);
+      }
+    } catch (_) {}
+  }
+
+  DOM_T.btn.addEventListener('click', () => {
+    DOM_T.panel.classList.remove('hidden');
+    refreshTimers();
+    timersInterval = setInterval(refreshTimers, 1000);
+  });
+
+  DOM_T.close.addEventListener('click', () => {
+    DOM_T.panel.classList.add('hidden');
+    clearInterval(timersInterval);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!DOM_T.panel.classList.contains('hidden') &&
+        !DOM_T.panel.contains(e.target) &&
+        e.target !== DOM_T.btn &&
+        !DOM_T.btn.contains(e.target)) {
+      DOM_T.panel.classList.add('hidden');
+      clearInterval(timersInterval);
+    }
+  });
+
   // ---------- Event Bindings ----------
 
   DOM.sendBtn.addEventListener('click', () => sendText(DOM.input.value));

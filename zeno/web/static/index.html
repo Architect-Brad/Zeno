@@ -15,6 +15,7 @@
       <h1>Zeno</h1>
     </div>
     <div class="topbar-actions">
+      <button id="btn-timers" class="icon-btn" title="Timers & Alarms">⏱️</button>
       <button id="btn-settings" class="icon-btn" title="Settings">⚙️</button>
       <button id="btn-clear" class="icon-btn" title="Clear conversation">🗑️</button>
     </div>
@@ -53,6 +54,16 @@
       <div class="setting-info">
         All processing is done locally on your device. No data leaves your machine.
       </div>
+    </div>
+  </aside>
+
+  <aside id="timers-panel" class="hidden">
+    <div class="settings-header">
+      <h2>⏱️ Timers & Alarms</h2>
+      <button id="btn-close-timers" class="icon-btn">✕</button>
+    </div>
+    <div class="settings-body" id="timers-list">
+      <div class="setting-info">No active timers or alarms.</div>
     </div>
   </aside>
 

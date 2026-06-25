@@ -12,6 +12,7 @@ from fastapi.responses import JSONResponse
 from zeno.core.context import Context
 from zeno.core.loop import process_input
 from zeno.platform import caps, detect_platform
+from zeno.skills.reminders import ReminderSkill
 
 router = APIRouter()
 
@@ -97,6 +98,46 @@ async def clear_history(x_session_id: Optional[str] = Cookie(None)):
     _history.pop(sid, None)
     _sessions.pop(sid, None)
     return {"status": "cleared"}
+
+
+# ---------- Timers / Alarms ----------
+
+@router.get("/api/timers")
+async def list_timers():
+    timers = []
+    now = time.time()
+    to_remove = []
+    for i, meta in enumerate(ReminderSkill._timer_meta):
+        elapsed = now - meta["started"]
+        remaining = max(0, meta["seconds"] - elapsed)
+        alive = i < len(ReminderSkill._active_timers) and ReminderSkill._active_timers[i].is_alive()
+        if not alive and remaining <= 0:
+            to_remove.append(i)
+            continue
+        timers.append({
+            "id": i,
+            "label": meta["label"],
+            "remaining": round(remaining),
+            "total": meta["seconds"],
+            "is_alarm": meta["is_alarm"],
+        })
+    for i in reversed(to_remove):
+        if i < len(ReminderSkill._timer_meta):
+            ReminderSkill._timer_meta.pop(i)
+        if i < len(ReminderSkill._active_timers):
+            ReminderSkill._active_timers.pop(i)
+    return {"timers": timers}
+
+
+@router.post("/api/timers/{timer_id}/cancel")
+async def cancel_timer(timer_id: int):
+    if timer_id < len(ReminderSkill._active_timers):
+        t = ReminderSkill._active_timers[timer_id]
+        t.cancel()
+        if timer_id < len(ReminderSkill._timer_meta):
+            ReminderSkill._timer_meta.pop(timer_id)
+        return {"status": "cancelled"}
+    return JSONResponse({"error": "not found"}, status_code=404)
 
 
 # ---------- Responses ----------
