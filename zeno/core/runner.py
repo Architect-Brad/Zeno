@@ -10,31 +10,50 @@ from zeno.core.context import Context
 from zeno.core.loop import process_input
 from zeno.audio.stt import listen
 from zeno.audio.tts import speak
+from zeno.memory.store import get_store
+
+_WAKE_WORDS = ("zeno", "hey")
 
 
 async def listen_async(timeout: int = 15) -> str | None:
-    """Async wrapper around STT."""
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, listen, timeout)
 
 
 async def speak_async(text: str) -> bool:
-    """Async wrapper around TTS."""
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, speak, text)
 
 
-async def run_voice_interaction(context: Context) -> str | None:
+async def listen_for_wake(timeout: int = 15) -> str | None:
     """
-    Single voice interaction: listen → process → speak.
-    Returns the response text, or None if no input.
+    Keep listening until the wake word is detected.
+    Returns the full utterance with wake word stripped.
+    Returns None if listening fails or is interrupted.
     """
-    text = await listen_async()
+    while True:
+        text = await listen_async(timeout=timeout)
+        if not text:
+            continue
+
+        lower = text.lower()
+        if any(ww in lower for ww in _WAKE_WORDS):
+            return text
+
+        print(".", end="", flush=True)
+
+
+async def run_voice_interaction(context: Context, require_wake: bool = False) -> str | None:
+    if require_wake:
+        text = await listen_for_wake()
+    else:
+        text = await listen_async()
+
     if not text:
         return None
 
-    # Prepend wake word for the NLU if not present
-    if not any(ww in text.lower() for ww in ("zeno", "hey")):
+    lower = text.lower()
+    if not any(ww in lower for ww in _WAKE_WORDS):
         text = f"hey zeno {text}"
 
     response = process_input(text, context)
@@ -42,19 +61,15 @@ async def run_voice_interaction(context: Context) -> str | None:
     return response
 
 
-async def run_voice_loop():
-    """
-    Continuous voice interaction loop.
-    Runs until KeyboardInterrupt.
-    """
+async def run_voice_loop(require_wake: bool = False):
     context = Context()
-    print("[Zeno] Voice assistant ready. Say 'Hey Zeno' or press Enter to start.")
-    print("[Zeno] Press Ctrl+C to exit.")
+    mode = "wake word" if require_wake else "push-to-talk"
+    print(f"[Zeno] Voice assistant ready. Mode: {mode}. Press Ctrl+C to exit.")
     sys.stdout.flush()
 
     while True:
         try:
-            response = await run_voice_interaction(context)
+            response = await run_voice_interaction(context, require_wake=require_wake)
             if response is None:
                 continue
         except (EOFError, KeyboardInterrupt):
@@ -66,10 +81,6 @@ async def run_voice_loop():
 
 
 def run_text_loop():
-    """
-    Simple text-only interaction loop for testing/dev.
-    Type commands at the prompt.
-    """
     context = Context()
     print("[Zeno] Text mode. Type 'exit' to quit.")
 
@@ -91,8 +102,11 @@ def run_text_loop():
 
 
 if __name__ == "__main__":
-    import sys
-    if "--voice" in sys.argv:
-        asyncio.run(run_voice_loop())
+    args = set(sys.argv[1:])
+    wake = "--wake" in args or "-w" in args
+    voice = "--voice" in args or "-v" in args
+
+    if voice or wake:
+        asyncio.run(run_voice_loop(require_wake=wake))
     else:
         run_text_loop()
