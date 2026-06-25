@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zeno</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand">
+      <span class="logo">⚡</span>
+      <h1>Zeno</h1>
+    </div>
+    <div class="topbar-actions">
+      <button id="btn-settings" class="icon-btn" title="Settings">⚙️</button>
+      <button id="btn-clear" class="icon-btn" title="Clear conversation">🗑️</button>
+    </div>
+  </header>
+
+  <aside id="settings-panel" class="hidden">
+    <div class="settings-header">
+      <h2>Settings</h2>
+      <button id="btn-close-settings" class="icon-btn">✕</button>
+    </div>
+    <div class="settings-body">
+      <div class="setting-row">
+        <label>Platform</label>
+        <span id="setting-platform" class="setting-value">—</span>
+      </div>
+      <div class="setting-row">
+        <label>Voice I/O</label>
+        <span id="setting-voice" class="setting-value">—</span>
+      </div>
+      <div class="setting-row">
+        <label>Notifications</label>
+        <span id="setting-notif" class="setting-value">—</span>
+      </div>
+      <div class="setting-row">
+        <label>Volume Control</label>
+        <span id="setting-vol" class="setting-value">—</span>
+      </div>
+      <div class="setting-row">
+        <label>Brightness</label>
+        <span id="setting-bright" class="setting-value">—</span>
+      </div>
+      <div class="setting-row">
+        <label>Lock Screen</label>
+        <span id="setting-lock" class="setting-value">—</span>
+      </div>
+      <div class="setting-info">
+        All processing is done locally on your device. No data leaves your machine.
+      </div>
+    </div>
+  </aside>
+
+  <main id="chat-container">
+    <div id="chat-log">
+      <div class="welcome">
+        <div class="zeno-msg msg">Hello! I'm Zeno, your local voice assistant. Ask me anything — timers, weather, calculations, system controls, or just chat.</div>
+      </div>
+    </div>
+  </main>
+
+  <footer id="input-bar">
+    <div class="input-row">
+      <button id="btn-voice" class="icon-btn voice-btn" title="Voice input">🎤</button>
+      <input id="text-input" type="text" placeholder="Type a message..." autofocus>
+      <button id="btn-send" class="send-btn" title="Send">➤</button>
+    </div>
+  </footer>
+</div>
+
+<div id="status-toast" class="toast hidden"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
