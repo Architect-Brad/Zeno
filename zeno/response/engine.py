@@ -44,6 +44,43 @@ _PHRASES: dict[str, list[str]] = {
         "Did you mean '{intent}'?", "Not sure I caught that — were you asking about {intent}?",
         "I'm a bit fuzzy on that — are you looking for {intent}?",
     ],
+    "weather_report": [
+        "It's {temp}{unit} and {conditions} in {location}.",
+        "Currently {temp}{unit} with {conditions} in {location}.",
+        "The weather in {location} is {temp}{unit} and {conditions}.",
+    ],
+    "weather_no_location": [
+        "I don't know where. Tell me a city or set your location in settings.",
+        "Where should I check the weather for?",
+    ],
+    "weather_unavailable": [
+        "Couldn't fetch the weather right now.",
+        "Weather data is not available at the moment.",
+    ],
+    "definition": [
+        "{word}: {definition}",
+        "Here's what I found: {word} means {definition}",
+        "According to DuckDuckGo, {word} is {definition}",
+    ],
+    "ddg_answer": [
+        "{answer}",
+        "Here's what I found: {answer}",
+    ],
+    "ddg_no_result": [
+        "I couldn't find anything on that.",
+        "DuckDuckGo didn't return any results for that.",
+    ],
+    "translation": [
+        "{translation}",
+        "That translates to: {translation}",
+    ],
+    "news_headline": [
+        "{headline}",
+        "Here's a headline: {headline}",
+    ],
+    "place_result": [
+        "I found {name} — {description}",
+    ],
 }
 
 

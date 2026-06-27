@@ -76,6 +76,16 @@ TRAINING_DATA: dict[str, list[str]] = {
         "is it raining", "what is the forecast", "how hot is it",
         "how is the weather outside", "weather check",
     ],
+    "weather_forecast": [
+        "5 day forecast", "forecast for this week", "what's the weather this week",
+        "weekly forecast", "forecast for the next few days",
+        "how will the weather be this week", "what's the forecast for this week",
+        "weather for the week", "week ahead forecast",
+        "what will the weather be like on monday", "forecast for tomorrow and the next day",
+        "extended forecast", "7 day forecast", "what's the weekend weather",
+        "how about the weather for the rest of the week",
+        "what's the outlook for this week", "weather this week",
+    ],
     "set_alarm": [
         "set an alarm", "set alarm", "wake me up at", "alarm at",
         "alarm for", "set an alarm for", "wake me at",
@@ -207,6 +217,154 @@ TRAINING_DATA: dict[str, list[str]] = {
         "tell me a riddle", "entertain me", "amuse me",
         "crack a joke", "say something funny",
     ],
+    "play_music": [
+        "play music", "play a song", "play some tunes", "start playing music",
+        "play something", "shuffle my playlist", "play my favorite song",
+        "play some music", "start the music", "play a track",
+    ],
+    "next_track": [
+        "next song", "next track", "skip", "skip this song", "skip this track",
+        "next", "play the next one", "next track please", "move to next",
+    ],
+    "previous_track": [
+        "previous song", "previous track", "go back", "play the previous song",
+        "previous", "rewind", "last song", "go to the previous track",
+        "play that again", "play the last one",
+    ],
+    "pause_music": [
+        "pause", "pause music", "pause playback", "stop the music",
+        "stop playing", "stop music", "pause the track", "hold on",
+        "freeze", "stop the song",
+    ],
+    "resume_music": [
+        "resume", "resume music", "keep playing", "continue playing",
+        "play again", "unpause", "start again", "resume playback",
+        "keep going", "continue the music",
+    ],
+    "lights_on": [
+        "turn on the lights", "lights on", "turn the lights on",
+        "switch on the lights", "lights please", "turn on light",
+        "illuminate", "brighten the room", "turn lights on",
+    ],
+    "lights_off": [
+        "turn off the lights", "lights off", "turn the lights off",
+        "switch off the lights", "kill the lights", "lights out",
+        "darken the room", "turn off light", "turn lights off",
+    ],
+    "set_thermostat": [
+        "set the temperature", "set thermostat", "change the temperature",
+        "make it warmer", "make it cooler", "set temperature to",
+        "adjust the thermostat", "turn up the heat", "turn on the ac",
+        "set the temp", "change the thermostat",
+    ],
+    "lock_door": [
+        "lock the door", "lock the front door", "lock up", "lock my door",
+        "secure the door", "lock the house", "lock the back door",
+        "lock everything", "lock it up",
+    ],
+    "security_check": [
+        "check security", "security status", "is everything secure",
+        "check the cameras", "security check", "are the doors locked",
+        "status security", "check if everything is safe",
+    ],
+    "send_message": [
+        "send a message", "send a text", "text someone", "send message to",
+        "send sms", "send a text message", "message", "drop a message",
+        "send a quick message", "text",
+    ],
+    "make_call": [
+        "make a call", "call", "phone", "call someone", "make a phone call",
+        "dial", "place a call", "call a contact", "ring someone",
+        "give them a call",
+    ],
+    "check_email": [
+        "check email", "read my emails", "check my inbox",
+        "do i have any emails", "check mail", "open email",
+        "show my emails", "unread emails", "email status",
+    ],
+    "read_notifications": [
+        "read notifications", "check notifications", "show notifications",
+        "what are my notifications", "show alerts", "notification check",
+        "read my alerts", "check my alerts", "show my notifications",
+    ],
+    "get_directions": [
+        "get directions", "navigate to", "directions to", "take me to",
+        "how do i get to", "route to", "show me the way to",
+        "navigation to", "guide me to", "directions",
+        "drop a pin", "find a route", "plan a route",
+    ],
+    "find_place": [
+        "find nearby", "what's near me", "find a place", "search nearby",
+        "nearby restaurants", "places near me", "find close by",
+        "what's around here", "nearby places", "what is near me",
+    ],
+    "traffic_check": [
+        "check traffic", "how is the traffic", "traffic status",
+        "traffic report", "is there traffic", "traffic conditions",
+        "how bad is traffic", "traffic today", "traffic update",
+    ],
+    "define_word": [
+        "define", "what does this word mean", "definition of",
+        "what is the meaning of", "dictionary", "define the word",
+        "meaning of", "word definition", "what does that mean",
+    ],
+    "translate_phrase": [
+        "translate", "how do you say", "translate to", "what is in spanish",
+        "translation", "in french", "in german", "translate this",
+        "say it in", "interpret",
+    ],
+    "check_battery": [
+        "check battery", "battery level", "how much battery",
+        "battery status", "what is my battery at", "battery percentage",
+        "how is my battery", "remaining battery", "power left",
+    ],
+    "flashlight_on": [
+        "turn on flashlight", "flashlight on", "turn the flashlight on",
+        "switch on flashlight", "light please", "flashlight",
+        "enable flashlight", "turn on the torch", "torch on",
+    ],
+    "flashlight_off": [
+        "turn off flashlight", "flashlight off", "turn the flashlight off",
+        "switch off flashlight", "disable flashlight", "torch off",
+        "shut off flashlight", "turn off the torch", "stop the light",
+    ],
+    "screenshot": [
+        "take a screenshot", "screenshot", "capture screen",
+        "take screenshot", "screen capture", "screen shot",
+        "capture the screen", "snap the screen",
+    ],
+    "wifi_on": [
+        "turn on wifi", "wifi on", "enable wifi", "turn the wifi on",
+        "switch on wifi", "connect to wifi", "turn wifi on",
+    ],
+    "wifi_off": [
+        "turn off wifi", "wifi off", "disable wifi", "turn the wifi off",
+        "switch off wifi", "disconnect wifi", "turn wifi off",
+    ],
+    "check_timer_status": [
+        "how much time left", "timer status", "remaining time",
+        "how long left", "what is the timer at", "time remaining on timer",
+        "check the timer", "how much longer", "is the timer done",
+    ],
+    "stop_timer": [
+        "stop timer", "cancel timer", "dismiss timer", "turn off timer",
+        "stop the timer", "timer off", "end the timer", "kill the timer",
+    ],
+    "set_volume_exact": [
+        "set volume", "set volume to", "volume level", "set the volume",
+        "volume to", "change volume to", "adjust volume to",
+        "turn volume to", "set volume at",
+    ],
+    "brightness_up": [
+        "brightness up", "increase brightness", "make it brighter",
+        "turn up brightness", "brighten", "increase screen brightness",
+        "more brightness", "brighter please", "raise brightness",
+    ],
+    "brightness_down": [
+        "brightness down", "decrease brightness", "make it dimmer",
+        "turn down brightness", "dim", "lower brightness",
+        "less brightness", "dimmer please", "reduce brightness",
+    ],
 }
 
 
@@ -253,30 +411,34 @@ class IntentClassifier:
     def __init__(self, ngram_range: tuple[int, int] = (2, 4)):
         self.vectorizer = NGramVectorizer(ngram_range)
         self.examples: dict[str, list[dict[str, float]]] = {}
+        self._phrase_vocab: dict[str, set[str]] = {}  # word vocab per intent
         self._is_fit = False
 
     def _expand_phrases(self, phrases: list[str]) -> list[str]:
-        expanded = []
-        skip_expand_prefixes = ("what", "how", "who", "why", "when", "which")
-        for phrase in phrases:
-            expanded.append(phrase)
-            lowered = phrase.lower()
-            if not lowered.startswith(skip_expand_prefixes):
-                expanded.append(f"i want to {lowered}")
-                expanded.append(f"i need to {lowered}")
-                expanded.append(f"can you {lowered}")
-                expanded.append(f"please {lowered}")
-                expanded.append(f"i'd like to {lowered}")
-        return expanded
+        expanded = list(phrases)
+        try:
+            from zeno.nlu.synonyms import expand_text
+            syn_expanded = []
+            for phrase in expanded:
+                syn_expanded.extend(expand_text(phrase))
+            return syn_expanded
+        except ImportError:
+            return expanded
 
     def fit(self, data: dict[str, list[str]] | None = None):
         training = data or TRAINING_DATA
+        self._phrase_vocab = {}
         for intent, phrases in training.items():
             vectors = []
+            words = set()
             expanded = self._expand_phrases(phrases)
             for phrase in expanded:
                 vectors.append(self.vectorizer.vectorize(phrase))
+                for w in re.findall(r'\w+', phrase.lower()):
+                    if len(w) > 2:
+                        words.add(w)
             self.examples[intent] = vectors
+            self._phrase_vocab[intent] = words
         self._is_fit = True
 
     def _max_similarity(self, query_vec: dict, intent: str) -> float:
@@ -305,6 +467,20 @@ class IntentClassifier:
 
         if not scores:
             return IntentResult(intent="unknown", confidence=0.0, raw=text)
+
+        # Word coverage bonus — semantic signal beyond n-grams
+        query_words = set(w.lower() for w in re.findall(r'\w+', text)
+                          if w.lower() not in {"a", "an", "the", "in", "at", "on",
+                                               "to", "for", "of", "is", "it", "and",
+                                               "or", "my", "i", "me", "you", "do",
+                                               "does", "can", "will", "with", "this",
+                                               "that", "please", "want", "need"})
+        if query_words:
+            for intent in scores:
+                vocab = self._phrase_vocab.get(intent, set())
+                if vocab:
+                    overlap = len(query_words & vocab) / len(query_words)
+                    scores[intent] += overlap * 0.12
 
         # Context boost
         if context_intent and context_intent in scores:
@@ -349,10 +525,10 @@ class IntentClassifier:
 LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
     "es": {
         "greeting": ["hola", "buenos días", "buenas tardes", "buenas noches", "hey", "qué tal", "saludos", "hola zeno"],
-        "farewell": ["adiós", "hasta luego", "nos vemos", "cuídate", "bye", "hasta pronto"],
         "time_query": ["qué hora es", "qué hora tienes", "dime la hora", "hora actual", "me das la hora"],
         "date_query": ["qué día es hoy", "qué fecha es", "dime la fecha", "fecha actual"],
         "weather_query": ["qué tiempo hace", "cómo está el clima", "va a llover", "temperatura", "clima"],
+        "weather_forecast": ["pronóstico para esta semana", "qué tiempo hará esta semana", "pronóstico semanal", "clima de los próximos días", "cómo estará el clima esta semana"],
         "set_alarm": ["pon una alarma", "despiértame a las", "alarma para", "necesito una alarma"],
         "set_timer": ["pon un temporizador", "temporizador de", "cuenta atrás", "temporizador para"],
         "set_reminder": ["recuérdame", "pon un recordatorio", "no me olvides", "recordatorio"],
@@ -361,6 +537,36 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "deny": ["no", "nunca", "para nada", "no gracias", "no quiero"],
         "cancel": ["cancelar", "olvídalo", "cancela eso", "no importa"],
         "identity_query": ["quién eres", "qué eres", "cómo te llamas", "qué puedes hacer"],
+        "play_music": ["pon música", "reproduce música", "pon una canción", "toca música", "pon algo de música"],
+        "next_track": ["siguiente canción", "siguiente pista", "siguiente", "adelante", "salta esta canción"],
+        "previous_track": ["canción anterior", "pista anterior", "atrás", "anterior", "vuelve a la anterior"],
+        "pause_music": ["pausa", "pausa la música", "detén la música", "para", "pausa la canción"],
+        "resume_music": ["continúa", "reanuda", "sigue con la música", "reproduce de nuevo"],
+        "lights_on": ["enciende las luces", "luces encendidas", "prende la luz", "enciende la luz"],
+        "lights_off": ["apaga las luces", "luces apagadas", "apaga la luz", "apaga todo"],
+        "set_thermostat": ["pon la temperatura", "cambia la temperatura", "sube la calefacción", "baja el aire"],
+        "lock_door": ["cierra la puerta", "bloquea la puerta", "cierra con llave", "asegura la puerta"],
+        "security_check": ["revisa la seguridad", "estado de seguridad", "cámaras", "todo seguro"],
+        "send_message": ["envía un mensaje", "manda un texto", "escribe un mensaje", "mensaje a"],
+        "make_call": ["haz una llamada", "llama", "llamada", "llama por teléfono"],
+        "check_email": ["revisa el correo", "correos", "bandeja de entrada", "tengo correos"],
+        "read_notifications": ["lee las notificaciones", "notificaciones", "qué notificaciones tengo"],
+        "get_directions": ["cómo llegar a", "navega a", "indicaciones para", "direcciones a"],
+        "find_place": ["encuentra cerca", "qué hay cerca", "lugares cercanos", "restaurantes cerca"],
+        "traffic_check": ["cómo está el tráfico", "tráfico", "estado del tráfico", "hay tráfico"],
+        "define_word": ["define", "qué significa", "definición de", "significado de", "diccionario"],
+        "translate_phrase": ["traduce", "cómo se dice", "traducción", "en español"],
+        "check_battery": ["batería", "nivel de batería", "cuánta batería queda", "estado de batería"],
+        "flashlight_on": ["enciende la linterna", "linterna encendida", "prende la linterna"],
+        "flashlight_off": ["apaga la linterna", "linterna apagada", "apaga la luz"],
+        "screenshot": ["toma una captura", "captura de pantalla", "screenshot", "captura la pantalla"],
+        "wifi_on": ["enciende el wifi", "wifi encendido", "activa el wifi", "conecta al wifi"],
+        "wifi_off": ["apaga el wifi", "wifi apagado", "desactiva el wifi", "desconecta el wifi"],
+        "check_timer_status": ["cuánto tiempo queda", "tiempo restante", "cómo va el temporizador"],
+        "stop_timer": ["para el temporizador", "cancela el temporizador", "detén el temporizador"],
+        "set_volume_exact": ["pon el volumen", "volumen a", "cambia el volumen a", "sube el volumen al"],
+        "brightness_up": ["sube el brillo", "más brillo", "aumenta el brillo", "brilla más"],
+        "brightness_down": ["baja el brillo", "menos brillo", "reduce el brillo", "disminuye el brillo"],
     },
     "fr": {
         "greeting": ["bonjour", "salut", "bonsoir", "coucou", "hello", "salut zeno"],
@@ -368,6 +574,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "time_query": ["quelle heure est-il", "donne-moi l'heure", "l'heure actuelle"],
         "date_query": ["quel jour sommes-nous", "quelle est la date", "date d'aujourd'hui"],
         "weather_query": ["quel temps fait-il", "météo", "va-t-il pleuvoir", "température"],
+        "weather_forecast": ["prévisions pour cette semaine", "quel temps fera-t-il cette semaine", "prévisions hebdomadaires", "météo des prochains jours", "prévisions pour les 5 jours"],
         "set_alarm": ["mets un réveil", "réveille-moi à", "alarme pour", "je besoin d'un réveil"],
         "set_timer": ["mets un minuteur", "minuteur de", "compte à rebours"],
         "set_reminder": ["rappelle-moi", "mets un rappel", "n'oublie pas de"],
@@ -376,6 +583,36 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "deny": ["non", "jamais", "pas du tout", "non merci"],
         "cancel": ["annuler", "oublie ça", "annule ça"],
         "identity_query": ["qui es-tu", "que es-tu", "comment tu t'appelles"],
+        "play_music": ["mets de la musique", "joue de la musique", "joue une chanson", "lance la musique"],
+        "next_track": ["chanson suivante", "piste suivante", "suivant", "passe à la suivante"],
+        "previous_track": ["chanson précédente", "piste précédente", "précédent", "reviens en arrière"],
+        "pause_music": ["pause", "mets en pause", "arrête la musique", "stop"],
+        "resume_music": ["reprends", "continue", "relance la musique", "rejoue"],
+        "lights_on": ["allume les lumières", "allume la lumière", "lumière"],
+        "lights_off": ["éteins les lumières", "éteins la lumière", "lumière éteinte"],
+        "set_thermostat": ["règle la température", "change la température", "mets le chauffage"],
+        "lock_door": ["ferme la porte", "verrouille la porte", "ferme à clé"],
+        "security_check": ["vérifie la sécurité", "état de sécurité", "caméras"],
+        "send_message": ["envoie un message", "texte", "envoie un sms", "message à"],
+        "make_call": ["passe un appel", "appelle", "téléphone", "fais un appel"],
+        "check_email": ["vérifie les emails", "mes emails", "boîte de réception", "nouveaux emails"],
+        "read_notifications": ["lis les notifications", "notifications", "montre les alertes"],
+        "get_directions": ["itinéraire vers", "navigue vers", "comment aller à"],
+        "find_place": ["trouve près de moi", "quoi près de moi", "restaurants près d'ici"],
+        "traffic_check": ["état du trafic", "trafic", "y a-t-il du trafic"],
+        "define_word": ["définis", "que signifie", "définition de", "sens du mot"],
+        "translate_phrase": ["traduis", "comment dit-on", "traduction", "en français"],
+        "check_battery": ["batterie", "niveau de batterie", "combien de batterie"],
+        "flashlight_on": ["allume la torche", "torche", "lampe de poche"],
+        "flashlight_off": ["éteins la torche", "torche éteinte"],
+        "screenshot": ["capture d'écran", "screenshot", "prends une capture"],
+        "wifi_on": ["allume le wifi", "wifi activé", "connecte au wifi"],
+        "wifi_off": ["éteins le wifi", "wifi désactivé", "déconnecte le wifi"],
+        "check_timer_status": ["combien de temps reste", "temps restant", "minuteur"],
+        "stop_timer": ["arrête le minuteur", "annule le minuteur", "stop minuteur"],
+        "set_volume_exact": ["règle le volume", "volume à", "mets le volume à"],
+        "brightness_up": ["augmente la luminosité", "plus lumineux", "éclaire plus"],
+        "brightness_down": ["baisse la luminosité", "moins lumineux", "diminue la luminosité"],
     },
     "de": {
         "greeting": ["hallo", "guten morgen", "guten tag", "guten abend", "servus", "hallo zeno", "moin"],
@@ -383,6 +620,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "time_query": ["wie spät ist es", "wie viel uhr", "aktuelle zeit", "hast du die uhrzeit"],
         "date_query": ["welcher tag ist heute", "welches datum", "heutiges datum"],
         "weather_query": ["wie ist das wetter", "wetter", "regnet es", "temperatur"],
+        "weather_forecast": ["vorhersage für diese woche", "wie wird das wetter diese woche", "wochenvorhersage", "wetter für die nächsten tage", "5 tage vorhersage"],
         "set_alarm": ["stell einen wecker", "weck mich um", "alarm für", "ich brauche einen wecker"],
         "set_timer": ["stell einen timer", "timer für", "countdown", "zeitmesser für"],
         "set_reminder": ["erinnere mich", "mach eine erinnerung", "vergiss nicht"],
@@ -391,6 +629,36 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "deny": ["nein", "nie", "gar nicht", "nein danke"],
         "cancel": ["abbrechen", "vergiss es", "storno"],
         "identity_query": ["wer bist du", "was bist du", "wie heißt du"],
+        "play_music": ["spiele musik", "spiel ein lied", "leg musik auf", "starte musik"],
+        "next_track": ["nächster titel", "nächster song", "weiter", "überspringen", "nächstes lied"],
+        "previous_track": ["vorheriger titel", "vorheriger song", "zurück", "letztes lied"],
+        "pause_music": ["pause", "stopp die musik", "pausieren", "anhalten", "musik aus"],
+        "resume_music": ["weiter", "fortsetzen", "weitermachen", "spiel weiter"],
+        "lights_on": ["mach das licht an", "licht an", "schalte das licht ein", "beleuchtung an"],
+        "lights_off": ["mach das licht aus", "licht aus", "schalte das licht aus", "beleuchtung aus"],
+        "set_thermostat": ["stell die temperatur", "temperatur ändern", "heizung höher", "kühler"],
+        "lock_door": ["schließ die tür", "tür abschließen", "verriegel die tür"],
+        "security_check": ["sicherheitsstatus", "überwachung prüfen", "ist alles sicher"],
+        "send_message": ["sende eine nachricht", "schreib eine sms", "nachricht an"],
+        "make_call": ["mach einen anruf", "anrufen", "telefonieren", "ruf an"],
+        "check_email": ["emails prüfen", "posteingang", "neue emails", "email-check"],
+        "read_notifications": ["benachrichtigungen lesen", "benachrichtigungen", "mitteilungen"],
+        "get_directions": ["navigation zu", "route zu", "wie komme ich zu"],
+        "find_place": ["finde in der nähe", "was ist in der nähe", "orte in der nähe"],
+        "traffic_check": ["verkehrsstatus", "verkehr", "stau", "verkehrslage"],
+        "define_word": ["definition von", "was bedeutet", "wörterbuch", "bedeutung"],
+        "translate_phrase": ["übersetze", "wie sagt man", "übersetzung", "auf deutsch"],
+        "check_battery": ["akku prüfen", "akku-stand", "wie viel akku", "batteriestatus"],
+        "flashlight_on": ["mach die taschenlampe an", "taschenlampe an", "licht an"],
+        "flashlight_off": ["mach die taschenlampe aus", "taschenlampe aus", "licht aus"],
+        "screenshot": ["bildschirmfoto", "screenshot", "mach einen screenshot"],
+        "wifi_on": ["wifi an", "schalte wifi ein", "verbinde mit wifi"],
+        "wifi_off": ["wifi aus", "schalte wifi aus", "trenne wifi"],
+        "check_timer_status": ["wie viel zeit bleibt", "restzeit", "timer-status", "wie lange noch"],
+        "stop_timer": ["timer stoppen", "timer abbrechen", "timer aus"],
+        "set_volume_exact": ["lautstärke einstellen", "lautstärke auf", "volume auf"],
+        "brightness_up": ["helligkeit erhöhen", "heller", "bildschirm heller"],
+        "brightness_down": ["helligkeit verringern", "dunkler", "bildschirm dunkler"],
     },
     "hi": {
         "greeting": ["नमस्ते", "नमस्कार", "हैलो", "क्या हाल है", "हेलो ज़ेनो"],
@@ -398,6 +666,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "time_query": ["कितने बजे हैं", "समय क्या हुआ", "क्या समय है", "टाइम बताओ"],
         "date_query": ["आज कौन सी तारीख है", "आज क्या दिन है", "डेट बताओ"],
         "weather_query": ["मौसम कैसा है", "क्या मौसम है", "बारिश होगी क्या"],
+        "weather_forecast": ["इस हफ्ते का मौसम", "पूर्वानुमान बताओ", "अगले कुछ दिनों का मौसम", "साप्ताहिक पूर्वानुमान", "5 दिन का मौसम"],
         "set_alarm": ["अलार्म लगाओ", "मुझे जगाओ", "अलार्म सेट करो"],
         "set_timer": ["टाइमर लगाओ", "टाइमर सेट करो", "गिनती शुरू करो"],
         "set_reminder": ["मुझे याद दिलाना", "रिमाइंडर लगाओ", "भूलना मत"],
@@ -406,6 +675,220 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "deny": ["नहीं", "जी नहीं", "कभी नहीं"],
         "cancel": ["रद्द करो", "भूल जाओ", "कैंसल करो"],
         "identity_query": ["तुम कौन हो", "तुम क्या हो", "आप कौन हैं"],
+        "play_music": ["संगीत बजाओ", "गाना सुनाओ", "म्यूज़िक चलाओ", "कोई गाना बजाओ"],
+        "next_track": ["अगला गाना", "अगला ट्रैक", "छोड़ो", "आगे बढ़ो"],
+        "previous_track": ["पिछला गाना", "पिछला ट्रैक", "पीछे जाओ", "वापस जाओ"],
+        "pause_music": ["रुको", "संगीत रोको", "विराम", "थोड़ी देर रुको"],
+        "resume_music": ["फिर से चलाओ", "जारी रखो", "दोबारा शुरू करो"],
+        "lights_on": ["लाइट जलाओ", "रोशनी चालू करो", "बत्ती जलाओ"],
+        "lights_off": ["लाइट बंद करो", "रोशनी बंद करो", "बत्ती बंद करो"],
+        "set_thermostat": ["तापमान सेट करो", "तापमान बदलो", "गर्मी बढ़ाओ", "एसी चालू करो"],
+        "lock_door": ["दरवाज़ा बंद करो", "दरवाज़ा लॉक करो", "ताला लगाओ"],
+        "security_check": ["सुरक्षा जाँचो", "सिक्योरिटी स्टेटस", "कैमरे चेक करो"],
+        "send_message": ["मैसेज भेजो", "टेक्स्ट भेजो", "संदेश भेजो", "मैसेज करो"],
+        "make_call": ["कॉल करो", "फ़ोन करो", "कॉल लगाओ"],
+        "check_email": ["ईमेल चेक करो", "मेल देखो", "इनबॉक्स चेक करो"],
+        "read_notifications": ["नोटिफिकेशन पढ़ो", "सूचनाएँ देखो", "अलर्ट चेक करो"],
+        "get_directions": ["रास्ता बताओ", "दिशा दिखाओ", "कैसे जाऊँ", "नेविगेशन"],
+        "find_place": ["पास में ढूँढ़ो", "आस-पास क्या है", "पास की जगहें"],
+        "traffic_check": ["ट्रैफिक कैसा है", "यातायात की स्थिति", "ट्रैफिक चेक करो"],
+        "define_word": ["अर्थ बताओ", "मतलब क्या है", "शब्दकोश", "परिभाषा बताओ"],
+        "translate_phrase": ["अनुवाद करो", "ट्रांसलेट करो", "इसका मतलब"],
+        "check_battery": ["बैटरी चेक करो", "बैटरी लेवल", "कितनी बैटरी है"],
+        "flashlight_on": ["फ़्लैशलाइट चालू करो", "टॉर्च जलाओ", "रोशनी डालो"],
+        "flashlight_off": ["फ़्लैशलाइट बंद करो", "टॉर्च बंद करो"],
+        "screenshot": ["स्क्रीनशॉट लो", "स्क्रीन कैप्चर करो", "फोटो लो स्क्रीन का"],
+        "wifi_on": ["वाईफ़ाई चालू करो", "वाईफ़ाई ऑन करो", "वाईफ़ाई से जुड़ो"],
+        "wifi_off": ["वाईफ़ाई बंद करो", "वाईफ़ाई ऑफ़ करो", "वाईफ़ाई हटाओ"],
+        "check_timer_status": ["कितना समय बचा", "बचा हुआ समय", "टाइमर की स्थिति"],
+        "stop_timer": ["टाइमर बंद करो", "टाइमर रद्द करो", "गिनती रोको"],
+        "set_volume_exact": ["वॉल्यूम सेट करो", "आवाज़ सेट करो", "वॉल्यूम बदलो"],
+        "brightness_up": ["चमक बढ़ाओ", "रोशनी बढ़ाओ", "ज़्यादा चमक"],
+        "brightness_down": ["चमक घटाओ", "रोशनी कम करो", "धीमी चमक"],
+    },
+    "ja": {
+        "greeting": ["こんにちは", "やあ", "おはよう", "こんばんは", "ゼノ", "ヘイ"],
+        "farewell": ["さようなら", "またね", "バイバイ", "じゃあね", "おやすみ"],
+        "time_query": ["今何時", "時間を教えて", "今の時間", "何時ですか"],
+        "date_query": ["今日は何日", "日付を教えて", "今日の日付", "何曜日"],
+        "weather_query": ["天気はどう", "今日の天気", "雨が降る", "気温は", "天気予報"],
+        "weather_forecast": ["今週の天気予報", "週間天気", "5日間の天気", "今週の天気は"],
+        "set_alarm": ["アラームをセット", "起こして", "アラーム", "目覚まし"],
+        "set_timer": ["タイマーをセット", "タイマー", "カウントダウン", "時間を計って"],
+        "set_reminder": ["リマインダー", "忘れないで", "思い出させて", "リマインド"],
+        "thanks": ["ありがとう", "どうも", "感謝", "サンキュー"],
+        "affirm": ["はい", "うん", "そう", "オーケー", "いいよ"],
+        "deny": ["いいえ", "違う", "ノー", "いや", "結構です"],
+        "cancel": ["キャンセル", "やめとく", "取り消し", "忘れて"],
+        "identity_query": ["あなたは誰", "何ができる", "名前は", "ゼノとは"],
+        "play_music": ["音楽をかけて", "曲を再生", "ミュージック", "何か歌って"],
+        "next_track": ["次の曲", "スキップ", "次へ", "次のトラック"],
+        "previous_track": ["前の曲", "戻って", "前のトラック", "巻き戻し"],
+        "pause_music": ["一時停止", "止めて", "ポーズ", "ストップ"],
+        "resume_music": ["再開", "続けて", "再生再開", "もう一度"],
+        "lights_on": ["電気をつけて", "照明オン", "明かりをつけて"],
+        "lights_off": ["電気を消して", "照明オフ", "明かりを消して"],
+        "set_thermostat": ["温度を設定", "エアコン", "暖房をつけて", "冷房"],
+        "lock_door": ["ドアをロック", "鍵をかける", "施錠"],
+        "security_check": ["セキュリティ確認", "安全チェック", "カメラ確認"],
+        "send_message": ["メッセージを送信", "テキスト", "伝言"],
+        "make_call": ["電話をかける", "コール", "電話して"],
+        "check_email": ["メールを確認", "受信箱", "新着メール"],
+        "read_notifications": ["通知を読んで", "お知らせ", "通知確認"],
+        "get_directions": ["道案内", "ナビ", "行き方", "ルート"],
+        "find_place": ["近くを探す", "周辺", "この辺りの"],
+        "traffic_check": ["交通情報", "渋滞", "道路状況"],
+        "define_word": ["意味は", "定義", "辞書", "どういう意味"],
+        "translate_phrase": ["翻訳", "英語でなんて言う", "訳して"],
+        "check_battery": ["バッテリー残量", "電池", "充電"],
+        "flashlight_on": ["ライトをつけて", "フラッシュライト", "懐中電灯"],
+        "flashlight_off": ["ライトを消して", "フラッシュライトオフ"],
+        "screenshot": ["スクリーンショット", "画面キャプチャ"],
+        "wifi_on": ["WiFiをオン", "ワイファイ繋いで", "無線LAN"],
+        "wifi_off": ["WiFiをオフ", "ワイファイ切って"],
+        "check_timer_status": ["残り時間", "タイマー残り", "あとどのくらい"],
+        "stop_timer": ["タイマー停止", "タイマー解除", "止めて"],
+        "set_volume_exact": ["音量設定", "ボリューム", "音量を"],
+        "brightness_up": ["明るくして", "輝度上げて", "画面明るく"],
+        "brightness_down": ["暗くして", "輝度下げて", "画面暗く"],
+    },
+    "ko": {
+        "greeting": ["안녕", "안녕하세요", "헤이", "좋은 아침", "제노"],
+        "farewell": ["잘 가", "다음에 봐", "안녕히 계세요", "잘 있어"],
+        "time_query": ["몇 시야", "지금 시간", "시간 알려줘", "몇 시예요"],
+        "date_query": ["오늘 날짜", "며칠이야", "오늘 무슨 요일"],
+        "weather_query": ["날씨 어때", "오늘 날씨", "비 올까", "기온은"],
+        "weather_forecast": ["이번 주 날씨", "주간 예보", "5일 예보", "주말 날씨"],
+        "set_alarm": ["알람 설정", "깨워 줘", "알람 맞춰", "모닝콜"],
+        "set_timer": ["타이머 설정", "타이머", "카운트다운"],
+        "set_reminder": ["리마인더", "잊지 말게", "알림 설정", "기억시켜 줘"],
+        "thanks": ["고마워", "감사합니다", "땡큐"],
+        "affirm": ["응", "네", "맞아", "좋아", "그래"],
+        "deny": ["아니", "아니요", "싫어", "괜찮아"],
+        "cancel": ["취소", "잊어버려", "취소할게"],
+        "identity_query": ["너 누구야", "뭐 할 수 있어", "이름이 뭐야"],
+        "play_music": ["음악 틀어", "노래 재생", "음악", "노래 들려줘"],
+        "next_track": ["다음 곡", "다음 트랙", "스킵", "넘겨"],
+        "previous_track": ["이전 곡", "이전 트랙", "되감기"],
+        "pause_music": ["일시 정지", "멈춰", "잠깐만"],
+        "resume_music": ["다시 재생", "계속", "이어서"],
+        "lights_on": ["불 켜", "조명 켜", "라이트 온"],
+        "lights_off": ["불 꺼", "조명 꺼", "라이트 오프"],
+        "set_thermostat": ["온도 설정", "에어컨", "난방", "온도 조절"],
+        "lock_door": ["문 잠가", "도어 락", "잠금"],
+        "security_check": ["보안 확인", "안전 점검", "카메라 확인"],
+        "send_message": ["메시지 보내", "문자 보내", "전송"],
+        "make_call": ["전화 걸어", "통화", "콜"],
+        "check_email": ["이메일 확인", "메일", "받은 편지함"],
+        "read_notifications": ["알림 읽어 줘", "노티 확인", "알림"],
+        "get_directions": ["길 안내", "네비", "가는 방법"],
+        "find_place": ["주변 찾기", "근처", "가까운"],
+        "traffic_check": ["교통 정보", "길 막혀", "교통 상황"],
+        "define_word": ["뜻이 뭐야", "사전", "의미", "정의"],
+        "translate_phrase": ["번역", "영어로 뭐야", "통역"],
+        "check_battery": ["배터리", "잔량", "충전 상태"],
+        "flashlight_on": ["손전등 켜", "플래시", "불 켜줘"],
+        "flashlight_off": ["손전등 꺼", "플래시 오프"],
+        "screenshot": ["스크린샷", "캡처", "화면 저장"],
+        "wifi_on": ["와이파이 켜", "WiFi 온", "인터넷 연결"],
+        "wifi_off": ["와이파이 꺼", "WiFi 오프"],
+        "check_timer_status": ["남은 시간", "타이머 확인", "얼마나 남았어"],
+        "stop_timer": ["타이머 멈춰", "타이머 취소"],
+        "set_volume_exact": ["볼륨 설정", "소리 크기", "음량"],
+        "brightness_up": ["밝게", "화면 밝기 올려", "더 밝게"],
+        "brightness_down": ["어둡게", "화면 밝기 내려", "더 어둡게"],
+    },
+    "pt": {
+        "greeting": ["olá", "oi", "bom dia", "boa tarde", "boa noite", "hey zeno", "e aí"],
+        "farewell": ["tchau", "até logo", "adeus", "até mais", "boa noite"],
+        "time_query": ["que horas são", "me diga as horas", "hora atual", "qual é a hora"],
+        "date_query": ["que dia é hoje", "qual a data de hoje", "data atual"],
+        "weather_query": ["como está o tempo", "vai chover", "temperatura", "clima", "previsão do tempo"],
+        "weather_forecast": ["previsão para esta semana", "clima da semana", "previsão semanal", "como vai estar o tempo esta semana"],
+        "set_alarm": ["definir alarme", "me acorde às", "alarme para", "coloque um alarme"],
+        "set_timer": ["definir timer", "cronômetro", "temporizador", "timer para"],
+        "set_reminder": ["me lembre", "criar lembrete", "não me deixe esquecer", "lembrete"],
+        "thanks": ["obrigado", "valeu", "muito obrigado", "agradecido"],
+        "affirm": ["sim", "claro", "ok", "beleza", "certo", "isso mesmo"],
+        "deny": ["não", "nunca", "de jeito nenhum", "não obrigado"],
+        "cancel": ["cancelar", "deixa pra lá", "esquece", "cancela"],
+        "identity_query": ["quem é você", "o que você é", "como se chama", "o que você faz"],
+        "play_music": ["tocar música", "coloque uma música", "toque algo", "música"],
+        "next_track": ["próxima música", "próxima faixa", "pular", "avançar"],
+        "previous_track": ["música anterior", "faixa anterior", "voltar", "anterior"],
+        "pause_music": ["pausar", "pausa", "pare a música", "parar"],
+        "resume_music": ["continuar", "retomar", "tocar de novo", "voltar a tocar"],
+        "lights_on": ["acender as luzes", "luzes acesas", "acenda a luz", "iluminar"],
+        "lights_off": ["apagar as luzes", "luzes apagadas", "apague a luz", "escurecer"],
+        "set_thermostat": ["ajustar temperatura", "mudar temperatura", "aquecer", "esfriar"],
+        "lock_door": ["trancar a porta", "feche a porta", "porta trancada"],
+        "security_check": ["verificar segurança", "status de segurança", "câmeras"],
+        "send_message": ["enviar mensagem", "mande um texto", "mensagem para"],
+        "make_call": ["fazer uma chamada", "ligar", "telefonar", "chamada"],
+        "check_email": ["verificar email", "meus emails", "caixa de entrada"],
+        "read_notifications": ["ler notificações", "notificações", "mostrar alertas"],
+        "get_directions": ["direções para", "navegar para", "como chegar em"],
+        "find_place": ["encontrar perto", "o que tem perto", "lugares próximos"],
+        "traffic_check": ["verificar trânsito", "trânsito", "como está o trânsito"],
+        "define_word": ["definir", "o que significa", "definição de", "dicionário"],
+        "translate_phrase": ["traduzir", "como se diz", "tradução", "em português"],
+        "check_battery": ["bateria", "nível da bateria", "quanto resta de bateria"],
+        "flashlight_on": ["ligar lanterna", "lanterna acesa", "flashlight"],
+        "flashlight_off": ["desligar lanterna", "lanterna apagada"],
+        "screenshot": ["capturar tela", "print", "screenshot"],
+        "wifi_on": ["ligar wifi", "wifi ligado", "conectar ao wifi"],
+        "wifi_off": ["desligar wifi", "wifi desligado", "desconectar wifi"],
+        "check_timer_status": ["quanto tempo falta", "tempo restante", "status do timer"],
+        "stop_timer": ["parar timer", "cancelar timer", "desligar timer"],
+        "set_volume_exact": ["definir volume", "volume para", "mudar volume para"],
+        "brightness_up": ["aumentar brilho", "mais brilho", "clarear"],
+        "brightness_down": ["diminuir brilho", "menos brilho", "escurecer"],
+    },
+    "ar": {
+        "greeting": ["مرحبا", "السلام عليكم", "أهلاً", "صباح الخير", "مساء الخير", "هاي"],
+        "farewell": ["وداعاً", "مع السلامة", "إلى اللقاء", "بااي", "تصبح على خير"],
+        "time_query": ["كم الساعة", "أخبرني بالوقت", "الوقت الآن", "الساعة"],
+        "date_query": ["ما تاريخ اليوم", "كم التاريخ", "أي يوم اليوم"],
+        "weather_query": ["كيف الطقس", "الطقس", "هل ستمطر", "درجة الحرارة", "الجو"],
+        "weather_forecast": ["توقعات هذا الأسبوع", "الطقس للأيام القادمة", "توقعات الأسبوع", "حالة الطقس الأسبوعية"],
+        "set_alarm": ["ضبط منبه", "أيقظني في", "منبه لـ", "نبهني"],
+        "set_timer": ["ضبط مؤقت", "مؤقت", "عداد", "تايمر"],
+        "set_reminder": ["ذكرني", "تذكير", "لا تنسى", "أضف تذكيراً"],
+        "thanks": ["شكراً", "جزاك الله خيراً", "ممنون", "تسلم"],
+        "affirm": ["نعم", "أجل", "طيب", "حسناً", "موافق"],
+        "deny": ["لا", "كلا", "أبداً", "لا شكراً"],
+        "cancel": ["إلغاء", "انس الأمر", "ألغِ"],
+        "identity_query": ["من أنت", "ما اسمك", "ماذا يمكنك أن تفعل", "ما أنت"],
+        "play_music": ["شغل موسيقى", "شغل أغنية", "دور موسيقى", "شغللي أغنية"],
+        "next_track": ["الأغنية التالية", "التالي", "تخطي", "الملف التالي"],
+        "previous_track": ["الأغنية السابقة", "السابق", "رجوع", "الملف السابق"],
+        "pause_music": ["إيقاف مؤقت", "وقف", "أوقف الموسيقى", "توقف"],
+        "resume_music": ["استمرار", "شغل مرة أخرى", "أكمل", "استأنف"],
+        "lights_on": ["أشعل الضوء", "الاضاءة", "النور", "ضوء"],
+        "lights_off": ["أطفئ الضوء", "اطفي النور", "إطفاء"],
+        "set_thermostat": ["ضبط درجة الحرارة", "دفايه", "تكييف", "حرارة"],
+        "lock_door": ["أغلق الباب", "قفل الباب", "اقفل"],
+        "security_check": ["فحص الأمان", "حالة الأمن", "كاميرات"],
+        "send_message": ["أرسل رسالة", "رسالة نصية", "رسالة لـ"],
+        "make_call": ["اتصل", "إجراء مكالمة", "كلم"],
+        "check_email": ["تفقد البريد", "الإيميلات", "صندوق الوارد"],
+        "read_notifications": ["اقرأ الإشعارات", "التنبيهات", "الإشعارات"],
+        "get_directions": ["اتجاهات إلى", "كيف أصل إلى", "الملاحة إلى"],
+        "find_place": ["ابحث بالقرب مني", "ماذا يوجد بالقرب", "أماكن قريبة"],
+        "traffic_check": ["حالة المرور", "الزحمة", "هل هناك زحام"],
+        "define_word": ["تعريف", "معنى", "القاموس", "ما معنى"],
+        "translate_phrase": ["ترجمة", "كيف نقول", "الترجمة إلى"],
+        "check_battery": ["البطارية", "نسبة البطارية", "كم البطارية"],
+        "flashlight_on": ["شغل الضوء", " flashlight", "كشاف"],
+        "flashlight_off": ["أطفئ الضوء", "إطفاء الكشاف"],
+        "screenshot": ["لقطة شاشة", "تصوير الشاشة", "سكرين شوت"],
+        "wifi_on": ["شغل الواي فاي", "واي فاي", "اتصال بالإنترنت"],
+        "wifi_off": ["أطفئ الواي فاي", "قطع الواي فاي"],
+        "check_timer_status": ["كم تبقى من الوقت", "الوقت المتبقي", "حالة المؤقت"],
+        "stop_timer": ["أوقف المؤقت", "إلغاء المؤقت", "أطفئ المؤقت"],
+        "set_volume_exact": ["ضبط مستوى الصوت", "الصوت", "درجة الصوت"],
+        "brightness_up": ["زيادة السطوع", "أضيئ أكثر", "ارفع الإضاءة"],
+        "brightness_down": ["تقليل السطوع", "أظلم", "خفف الإضاءة"],
     },
 }
 
@@ -413,12 +896,16 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
 def detect_language(text: str) -> str:
     """
     Heuristic language detection from Unicode ranges.
-    Returns 'hi' for Devanagari, 'zh' for CJK, 'ar' for Arabic, 'en' as fallback.
+    Supports: hi, ja, ko, ar, zh, ru, en (fallback).
     """
     for ch in text:
         cp = ord(ch)
         if 0x0900 <= cp <= 0x097F:
             return "hi"
+        if 0x3040 <= cp <= 0x309F or 0x30A0 <= cp <= 0x30FF:
+            return "ja"
+        if 0xAC00 <= cp <= 0xD7AF:
+            return "ko"
         if 0x4E00 <= cp <= 0x9FFF or 0x3400 <= cp <= 0x4DBF:
             return "zh"
         if 0x0600 <= cp <= 0x06FF:
@@ -481,7 +968,7 @@ def get_classifier(language: str | None = None) -> IntentClassifier:
 
 
 def set_language(lang: str):
-    """Set the language for intent classification (en, es, fr, de, hi, auto)."""
+    """Set the language (en, es, fr, de, hi, ja, ko, pt, ar, auto)."""
     if lang in LANGUAGE_PHRASES or lang in ("en", "auto"):
         get_classifier(lang)
 

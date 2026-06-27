@@ -1,6 +1,6 @@
 /**
  * Zeno Web UI — client-side logic.
- * Handles chat, voice input (Web Speech API), settings, and session management.
+ * Handles chat, voice input (Web Speech API), settings, peers, and timers.
  */
 
 (function () {
@@ -17,6 +17,10 @@
     closeSettings: document.getElementById('btn-close-settings'),
     clearBtn: document.getElementById('btn-clear'),
     toast: document.getElementById('status-toast'),
+    peersBtn: document.getElementById('btn-peers'),
+    peersPanel: document.getElementById('peers-panel'),
+    peersList: document.getElementById('peers-list'),
+    closePeers: document.getElementById('btn-close-peers'),
   };
 
   let toastTimer = null;
@@ -186,13 +190,53 @@
       const data = await res.json();
       document.getElementById('setting-platform').textContent = data.platform || 'unknown';
       const c = data.caps || {};
-      document.getElementById('setting-voice').textContent = c.tts && c.stt ? '✅ Full' : c.tts ? '🔊 TTS only' : c.stt ? '🎤 STT only' : '❌ None';
-      document.getElementById('setting-notif').textContent = c.notifications ? '✅ Yes' : '❌ No';
-      document.getElementById('setting-vol').textContent = c.volume ? '✅ Yes' : '❌ No';
-      document.getElementById('setting-bright').textContent = c.brightness ? '✅ Yes' : '❌ No';
-      document.getElementById('setting-lock').textContent = c.lock_screen ? '✅ Yes' : '❌ No';
+      document.getElementById('setting-voice').textContent = c.tts && c.stt ? 'Full' : c.tts ? 'TTS only' : c.stt ? 'STT only' : 'None';
+      document.getElementById('setting-notif').textContent = c.notifications ? 'Yes' : 'No';
+      document.getElementById('setting-vol').textContent = c.volume ? 'Yes' : 'No';
+      document.getElementById('setting-bright').textContent = c.brightness ? 'Yes' : 'No';
+      document.getElementById('setting-lock').textContent = c.lock_screen ? 'Yes' : 'No';
     } catch (_) {}
   }
+
+  async function loadProfile() {
+    try {
+      const res = await fetch('/api/profile');
+      const data = await res.json();
+      document.getElementById('edit-name').value = data.name || '';
+      document.getElementById('edit-location').value = data.location || '';
+      document.getElementById('edit-owm-key').value = data.owm_api_key || '';
+      document.getElementById('edit-units').value = data.units || 'celsius';
+      document.getElementById('edit-timezone').value = data.timezone || '';
+    } catch (_) {}
+  }
+
+  async function saveProfile() {
+    const body = {
+      name: document.getElementById('edit-name').value.trim(),
+      location: document.getElementById('edit-location').value.trim(),
+      owm_api_key: document.getElementById('edit-owm-key').value.trim(),
+      units: document.getElementById('edit-units').value,
+      timezone: document.getElementById('edit-timezone').value.trim(),
+    };
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        const status = document.getElementById('profile-status');
+        status.textContent = 'Profile saved.';
+        status.style.display = 'block';
+        setTimeout(() => { status.style.display = 'none'; }, 2000);
+        showToast('Profile saved');
+      }
+    } catch (_) {
+      showToast('Failed to save profile', 2000);
+    }
+  }
+
+  document.getElementById('btn-save-profile').addEventListener('click', saveProfile);
 
   // ---------- History ----------
 
@@ -298,6 +342,67 @@
     }
   });
 
+  // ---------- Peers Panel ----------
+
+  let peersInterval = null;
+
+  const DOM_P = {
+    panel: document.getElementById('peers-panel'),
+    btn: document.getElementById('btn-peers'),
+    close: document.getElementById('btn-close-peers'),
+    list: document.getElementById('peers-list'),
+  };
+
+  async function refreshPeers() {
+    try {
+      const res = await fetch('/api/sync/peers');
+      const data = await res.json();
+      const peers = data.peers || [];
+      DOM_P.list.innerHTML = '';
+
+      if (peers.length === 0) {
+        DOM_P.list.innerHTML = '<div class="setting-info">No LAN peers found. Ensure other Zeno instances are running with sync enabled on the same network.</div>';
+        return;
+      }
+
+      for (const p of peers) {
+        const card = document.createElement('div');
+        card.className = 'peer-card';
+        const age = Date.now() / 1000 - (p.last_seen || 0);
+        const online = age < 60;
+        card.innerHTML = `
+          <div class="peer-name">${p.name || p.id}</div>
+          <div class="peer-host">${p.host}:${p.port}</div>
+          <div class="peer-status ${online ? '' : 'offline'}">${online ? 'Online' : 'Offline'}</div>
+        `;
+        DOM_P.list.appendChild(card);
+      }
+    } catch (_) {
+      DOM_P.list.innerHTML = '<div class="setting-info">Could not reach sync service.</div>';
+    }
+  }
+
+  DOM_P.btn.addEventListener('click', () => {
+    DOM_P.panel.classList.remove('hidden');
+    refreshPeers();
+    peersInterval = setInterval(refreshPeers, 5000);
+  });
+
+  DOM_P.close.addEventListener('click', () => {
+    DOM_P.panel.classList.add('hidden');
+    clearInterval(peersInterval);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!DOM_P.panel.classList.contains('hidden') &&
+        !DOM_P.panel.contains(e.target) &&
+        e.target !== DOM_P.btn &&
+        !DOM_P.btn.contains(e.target)) {
+      DOM_P.panel.classList.add('hidden');
+      clearInterval(peersInterval);
+    }
+  });
+
   // ---------- Event Bindings ----------
 
   DOM.sendBtn.addEventListener('click', () => sendText(DOM.input.value));
@@ -305,6 +410,7 @@
   DOM.settingsBtn.addEventListener('click', () => {
     DOM.settingsPanel.classList.remove('hidden');
     loadSettings();
+    loadProfile();
   });
   DOM.closeSettings.addEventListener('click', () => DOM.settingsPanel.classList.add('hidden'));
   DOM.clearBtn.addEventListener('click', clearHistory);

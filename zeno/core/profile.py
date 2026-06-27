@@ -21,6 +21,9 @@ class Calibration:
 class Profile:
     name: str | None = None
     timezone: str | None = None
+    location: str | None = None
+    owm_api_key: str | None = None
+    units: str = "celsius"
     calibration: Calibration = field(default_factory=Calibration)
 
     @property
@@ -40,6 +43,9 @@ def load_profile() -> Profile:
     return Profile(
         name=store.get("profile.name"),
         timezone=store.get("profile.timezone"),
+        location=store.get("profile.location"),
+        owm_api_key=store.get("profile.owm_api_key"),
+        units=store.get("profile.units", "celsius"),
         calibration=cal,
     )
 
@@ -50,6 +56,18 @@ def save_name(name: str):
 
 def save_timezone(tz: str):
     get_store().set("profile.timezone", tz)
+
+
+def save_location(location: str):
+    get_store().set("profile.location", location)
+
+
+def save_owm_key(key: str):
+    get_store().set("profile.owm_api_key", key)
+
+
+def save_units(units: str):
+    get_store().set("profile.units", units)
 
 
 def save_calibration(cal: Calibration):

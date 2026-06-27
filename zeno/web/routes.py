@@ -201,6 +201,73 @@ async def sync_peers():
     }
 
 
+# ---------- Profile ----------
+
+from zeno.core.profile import load_profile, save_location, save_owm_key, save_units, save_name, save_timezone
+
+
+@router.get("/api/profile")
+async def get_profile():
+    p = load_profile()
+    return {
+        "name": p.name or "",
+        "timezone": p.timezone or "",
+        "location": p.location or "",
+        "owm_api_key": "****" if p.owm_api_key else "",
+        "units": p.units,
+    }
+
+
+@router.post("/api/profile")
+async def update_profile(request: Request):
+    body = await request.json()
+    for key, saver in [
+        ("name", save_name),
+        ("timezone", save_timezone),
+        ("location", save_location),
+        ("owm_api_key", lambda v: save_owm_key(v)),
+        ("units", save_units),
+    ]:
+        val = body.get(key)
+        if val is not None:
+            saver(val)
+    return {"status": "ok"}
+
+
+# ---------- Contacts ----------
+
+from zeno.core.contact_store import load_contacts, save_contacts, find_contact, get_contact_names
+
+
+@router.get("/api/contacts")
+async def list_contacts():
+    return {"contacts": load_contacts()}
+
+
+@router.post("/api/contacts")
+async def add_or_update_contact(request: Request):
+    body = await request.json()
+    name = body.get("name", "").strip()
+    if not name:
+        return JSONResponse({"error": "name required"}, status_code=400)
+    contacts = load_contacts()
+    contacts[name] = {
+        "phone": body.get("phone", ""),
+        "email": body.get("email", ""),
+    }
+    save_contacts(contacts)
+    return {"status": "ok", "name": name}
+
+
+@router.delete("/api/contacts/{contact_name}")
+async def delete_contact(contact_name: str):
+    contacts = load_contacts()
+    if contact_name in contacts:
+        del contacts[contact_name]
+        save_contacts(contacts)
+    return {"status": "deleted"}
+
+
 # ---------- Internal ----------
 
 def _record_history(session_id: str, text: str, response: str):

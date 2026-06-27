@@ -16,6 +16,7 @@
     </div>
     <div class="topbar-actions">
       <button id="btn-timers" class="icon-btn" title="Timers & Alarms">⏱️</button>
+      <button id="btn-peers" class="icon-btn" title="LAN Peers">🖥️</button>
       <button id="btn-settings" class="icon-btn" title="Settings">⚙️</button>
       <button id="btn-clear" class="icon-btn" title="Clear conversation">🗑️</button>
     </div>
@@ -27,6 +28,7 @@
       <button id="btn-close-settings" class="icon-btn">✕</button>
     </div>
     <div class="settings-body">
+      <h3 class="settings-section-title">Device Info</h3>
       <div class="setting-row">
         <label>Platform</label>
         <span id="setting-platform" class="setting-value">—</span>
@@ -51,6 +53,34 @@
         <label>Lock Screen</label>
         <span id="setting-lock" class="setting-value">—</span>
       </div>
+
+      <h3 class="settings-section-title">Profile</h3>
+      <div class="setting-row">
+        <label>Name</label>
+        <input id="edit-name" class="setting-input" type="text" placeholder="Your name">
+      </div>
+      <div class="setting-row">
+        <label>Location</label>
+        <input id="edit-location" class="setting-input" type="text" placeholder="City name">
+      </div>
+      <div class="setting-row">
+        <label>OWM API Key</label>
+        <input id="edit-owm-key" class="setting-input" type="password" placeholder="OpenWeatherMap key">
+      </div>
+      <div class="setting-row">
+        <label>Units</label>
+        <select id="edit-units" class="setting-input setting-select">
+          <option value="celsius">Celsius</option>
+          <option value="fahrenheit">Fahrenheit</option>
+        </select>
+      </div>
+      <div class="setting-row">
+        <label>Timezone</label>
+        <input id="edit-timezone" class="setting-input" type="text" placeholder="e.g. America/New_York">
+      </div>
+      <button id="btn-save-profile" class="send-btn" style="width:100%;margin-top:8px">Save Profile</button>
+      <div id="profile-status" class="setting-info" style="display:none"></div>
+
       <div class="setting-info">
         All processing is done locally on your device. No data leaves your machine.
       </div>
@@ -64,6 +94,16 @@
     </div>
     <div class="settings-body" id="timers-list">
       <div class="setting-info">No active timers or alarms.</div>
+    </div>
+  </aside>
+
+  <aside id="peers-panel" class="hidden">
+    <div class="settings-header">
+      <h2>🖥️ LAN Peers</h2>
+      <button id="btn-close-peers" class="icon-btn">✕</button>
+    </div>
+    <div class="settings-body" id="peers-list">
+      <div class="setting-info">Scanning for peers...</div>
     </div>
   </aside>
 

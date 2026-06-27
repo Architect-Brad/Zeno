@@ -18,6 +18,7 @@ class Entities:
     app_name: str | None = None
     location: str | None = None
     name: str | None = None
+    contact_name: str | None = None
     expression: str | None = None
     raw_target: str | None = None
     raw: dict[str, str] = field(default_factory=dict)
@@ -182,12 +183,14 @@ def _extract_app_name(text: str, intent_hint: str | None = None) -> str | None:
 
 
 def _extract_location(text: str, intent_hint: str | None = None) -> str | None:
-    """Extract location for weather queries."""
-    if intent_hint != "weather_query":
-        return None
-    m = re.search(_LOCATION_PATTERNS[0], text)
-    if m:
-        return m.group(1).strip()
+    """Extract location from text for any intent."""
+    # Named places: "in London", "at home", "near Paris"
+    for pattern in _LOCATION_PATTERNS:
+        m = re.search(pattern, text)
+        if m:
+            candidate = m.group(1).strip()
+            if candidate.lower() not in ("the", "my", "your", "this", "that", "it"):
+                return candidate
     return None
 
 
@@ -263,10 +266,19 @@ def extract_entities(text: str, intent_hint: str | None = None) -> Entities:
             m = re.search(pattern, text, re.IGNORECASE)
             if m and m.group(1).strip():
                 candidate = m.group(1).strip().title()
-                # Filter out common non-name words
                 if candidate.lower() not in ("hey", "hi", "hello", "yes", "no", "ok", "okay", "sure", "bye"):
                     entities.name = candidate
                     break
+
+    # Extract contact name from address book
+    if intent_hint in (None, "send_message", "make_call"):
+        from zeno.core.contact_store import get_contact_names
+        known = get_contact_names()
+        lower = text.lower()
+        for contact in sorted(known, key=len, reverse=True):
+            if contact.lower() in lower:
+                entities.contact_name = contact
+                break
 
     entities.raw = {"text": text, "intent_hint": intent_hint or ""}
     return entities

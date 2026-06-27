@@ -1,6 +1,6 @@
 """
 Zeno Runner — async voice interaction loop.
-Orchestrates: listen → process → speak.
+Orchestrates: listen -> process -> speak.
 Gracefully handles Termux API absence (falls back to text I/O).
 """
 
@@ -43,8 +43,15 @@ async def listen_for_wake(timeout: int = 15) -> str | None:
         print(".", end="", flush=True)
 
 
-async def run_voice_interaction(context: Context, require_wake: bool = False) -> str | None:
-    if require_wake:
+async def run_voice_interaction(context: Context,
+                                 require_wake: bool = False,
+                                 native_wake: bool = False) -> str | None:
+    if native_wake:
+        from zeno.audio.wake import wait_for_wake_word
+        text = await asyncio.get_running_loop().run_in_executor(
+            None, lambda: wait_for_wake_word(timeout=30)
+        )
+    elif require_wake:
         text = await listen_for_wake()
     else:
         text = await listen_async()
@@ -61,15 +68,22 @@ async def run_voice_interaction(context: Context, require_wake: bool = False) ->
     return response
 
 
-async def run_voice_loop(require_wake: bool = False):
+async def run_voice_loop(require_wake: bool = False, native_wake: bool = False):
     context = Context()
-    mode = "wake word" if require_wake else "push-to-talk"
+    if native_wake:
+        mode = "native wake word (VAD)"
+    elif require_wake:
+        mode = "wake word"
+    else:
+        mode = "push-to-talk"
     print(f"[Zeno] Voice assistant ready. Mode: {mode}. Press Ctrl+C to exit.")
     sys.stdout.flush()
 
     while True:
         try:
-            response = await run_voice_interaction(context, require_wake=require_wake)
+            response = await run_voice_interaction(
+                context, require_wake=require_wake, native_wake=native_wake
+            )
             if response is None:
                 continue
         except (EOFError, KeyboardInterrupt):
@@ -106,8 +120,15 @@ if __name__ == "__main__":
     wake = "--wake" in args or "-w" in args
     voice = "--voice" in args or "-v" in args
     continuous = "--continuous" in args or "-c" in args
+    native = "--native-wake" in args or "-n" in args
 
-    if continuous or voice or wake:
-        asyncio.run(run_voice_loop(require_wake=wake))
+    if "--discover" in args:
+        from zeno.core.discover import discover
+        discover()
+        sys.exit(0)
+
+    if continuous or voice or wake or native:
+        asyncio.run(run_voice_loop(require_wake=wake or native,
+                                    native_wake=native))
     else:
         run_text_loop()
