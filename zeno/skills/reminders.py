@@ -156,16 +156,6 @@ class ReminderSkill(BaseSkill):
         show_notification("Zeno Reminder", f"📌 Don't forget: {subject}")
 
     @staticmethod
-    def list_timers() -> list[dict]:
-        import datetime
-        now = datetime.datetime.now()
-        result = []
-        for t in ReminderSkill._active_timers:
-            remaining = max(0, t.interval - (time.time() - (t.finished_at if hasattr(t, 'finished_at') else 0)))
-            if hasattr(t, 'func') and t.is_alive():
-                result.append({
-                    "remaining": remaining,
-                    "interval": t.interval,
-                    "alive": t.is_alive(),
-                })
-        return result
+    def import_timer(seconds: int, label: str, is_alarm: bool = False):
+        """Import a timer from a remote peer."""
+        ReminderSkill()._schedule_timer(seconds, label, is_alarm)

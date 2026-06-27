@@ -148,6 +148,59 @@ async def list_response_keys():
     return {"keys": list(_PHRASES.keys())}
 
 
+# ---------- Sync ----------
+
+from zeno.core.sync import instance_id, context_to_dict, profile_to_dict, timers_to_dict, ContextMerger
+
+
+@router.post("/api/sync/push")
+async def sync_push(request: Request):
+    body = await request.json()
+    remote_iid = body.get("instance_id", "unknown")
+    turns = body.get("turns", [])
+    profile = body.get("profile", {})
+    timers = body.get("timers", [])
+
+    # Merge into default session
+    _, ctx = _ensure_session(None)
+    merger = ContextMerger()
+    n = merger.merge_turns(ctx, turns)
+    merger.merge_profile(profile)
+    merger.merge_timers(timers)
+
+    return {"status": "ok", "merged": n, "peer": remote_iid}
+
+
+@router.get("/api/sync/pull")
+async def sync_pull():
+    _, ctx = _ensure_session(None)
+    return {
+        "instance_id": instance_id(),
+        "turns": context_to_dict(ctx).get("turns", []),
+        "profile": profile_to_dict(),
+        "timers": timers_to_dict(),
+    }
+
+
+@router.get("/api/sync/peers")
+async def sync_peers():
+    from zeno.web.app import _discovery
+    if _discovery is None:
+        return {"peers": []}
+    return {
+        "peers": [
+            {
+                "id": p.instance_id,
+                "name": p.name,
+                "host": p.host,
+                "port": p.port,
+                "last_seen": p.last_seen,
+            }
+            for p in _discovery.peers.values()
+        ]
+    }
+
+
 # ---------- Internal ----------
 
 def _record_history(session_id: str, text: str, response: str):
