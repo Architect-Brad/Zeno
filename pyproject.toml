@@ -22,6 +22,9 @@ web = [
 weather = [
     "httpx",
 ]
+tui = [
+    "textual>=0.41",
+]
 test = [
     "pytest",
     "httpx",

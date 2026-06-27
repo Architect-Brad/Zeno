@@ -149,14 +149,17 @@ class ExtrasSkill(BaseSkill):
     def _set_volume_exact(self, entities: Entities) -> str:
         if not caps().volume:
             return self.say("Volume control isn't available here.")
+        level = None
         if entities.expression:
             try:
                 level = int(entities.expression)
             except (ValueError, TypeError):
-                level = 50
-            level = max(0, min(100, level))
-        else:
+                pass
+        if level is None and entities.number is not None:
+            level = int(entities.number)
+        if level is None:
             level = 50
+        level = max(0, min(100, level))
         set_volume("music", level)
         return self.say(f"Volume set to {level}.")
 

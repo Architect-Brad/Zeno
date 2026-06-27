@@ -95,6 +95,7 @@ zeno/
 │   ├── loop.py           # process_input() — multi-intent split, fragment carry-over, NLU→Skills
 │   ├── context.py        # Turn history, slot-filling, pronoun resolution, dialog state
 │   ├── runner.py         # Async voice loop, text loop, wake/continuous/native-wake modes
+│   ├── term.py           # ANSI terminal colors, styles, width detection
 │   ├── profile.py        # User identity, location, OWM key, units, voice calibration
 │   ├── plugins.py        # Plugin auto-loader from ~/.zeno/plugins/
 │   ├── contact_store.py  # JSON address book, find_contact() for messaging/calling
@@ -134,6 +135,8 @@ zeno/
 │   └── store.py          # SQLite key-value store
 ├── response/             # Response engine
 │   └── engine.py         # Phrase selection with template variables (randomized)
+├── tui/                  # Textual terminal UI
+│   └── app.py           # TUI app: chat log, input bar, timer panel, status bar
 └── web/                  # Web dashboard
     ├── server.py         # FastAPI/uvicorn entry point
     ├── app.py            # Application factory + sync startup
@@ -179,19 +182,26 @@ cd Zeno/Code
 # Web dashboard (optional)
 pip install "zeno[web]"    # or: pip install fastapi uvicorn websockets
 
+# TUI (optional)
+pip install "zeno[tui]"    # or: pip install textual
+
 # Run
-python -m zeno.core.runner          # text mode
+python -m zeno.core.runner          # text mode (with readline + colors)
+python -m zeno.core.runner --tui    # terminal UI mode
 python -m zeno.web.server           # web UI at http://127.0.0.1:8080
 ```
 
 ### Run Modes
 
 ```bash
-python -m zeno.core.runner                        # text mode
+python -m zeno.core.runner                        # text mode (readline + ANSI colors)
 python -m zeno.core.runner --voice                # push-to-talk
 python -m zeno.core.runner --wake                 # wake word activation
 python -m zeno.core.runner --native-wake          # VAD-based wake (lower latency)
+python -m zeno.core.runner --tui                  # terminal UI (Textual)
 python -m zeno.core.runner --discover             # browse plugin registry
+python -m zeno.core.runner --help                 # show all flags
+python -m zeno.core.runner --version              # show version
 
 python -m zeno.web.server                         # web UI (port 8080)
 python -m zeno.web.server --host 0.0.0.0 --port 8080
@@ -223,6 +233,51 @@ python -m zeno.web.server --no-sync               # disable LAN sync
 "send a message to mom"      → contact-aware messaging
 "tell me a joke"             → fun request
 "cancel"                     → cancel current operation
+
+### Slash Commands (Text Mode + TUI)
+
+```
+/help                        → show all slash commands and shorthand
+/w London                    → weather in London
+/f Paris                     → 5-day forecast for Paris
+/t                           → current time
+/d                           → current date
+/a 7am wake up               → alarm at 7:00 AM called "wake up"
+/timer 5m pizza              → 5-minute timer called "pizza"
+/remind buy groceries        → reminder to buy groceries
+/v 75                        → set volume to 75
+/v+ /v-                      → volume up / down
+/m                           → mute
+/b+ /b-                      → brightness up / down
+/lock                        → lock screen
+/open calculator             → open the calculator app
+/lights on /lights off       → smart home lights
+/n                           → news headlines
+/s what is the capital of France  → DuckDuckGo search
+```
+
+### Shorthand Syntax
+
+```
+5m pizza                     → 5-minute timer "pizza"
+10min                        → 10-minute timer (no label)
+7am wake up                  → alarm at 07:00 AM "wake up"
+1h30m backup                 → 1.5-hour timer "backup"
+```
+
+### CLI Flags
+
+| Flag | Description |
+|------|-------------|
+| (none) | Text mode with readline history, ANSI colors, tab completion |
+| `--voice` / `-v` | Push-to-talk voice mode |
+| `--wake` / `-w` | Wake word activation (STT polling) |
+| `--native-wake` / `-n` | VAD-based wake word (lower latency) |
+| `--continuous` / `-c` | Keep listening after each response |
+| `--tui` | Terminal UI (Textual) with chat log + timer panel |
+| `--discover [name]` | Browse or install community plugins |
+| `--version` | Show version and exit |
+| `--help` | Show help message with examples |
 ```
 
 ---
