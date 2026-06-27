@@ -31,8 +31,12 @@ def create_app(web_port: int = 8080, enable_sync: bool = True) -> FastAPI:
     @app.get("/")
     async def index():
         from fastapi.responses import FileResponse
-        index_path = os.path.join(STATIC_DIR, "index.html")
-        return FileResponse(index_path)
+        return FileResponse(os.path.join(STATIC_DIR, "index.html"))
+
+    @app.get("/chat")
+    async def chat():
+        from fastapi.responses import FileResponse
+        return FileResponse(os.path.join(STATIC_DIR, "chat.html"))
 
     @app.on_event("shutdown")
     async def shutdown():

@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Zeno — On-Device Voice Assistant</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+<style>
+:root {
+  --bg: #0d1117;
+  --bg-secondary: #161b22;
+  --bg-tertiary: #21262d;
+  --border: #30363d;
+  --text: #c9d1d9;
+  --text-muted: #8b949e;
+  --accent: #58a6ff;
+  --accent-dim: #1f6feb;
+  --danger: #f85149;
+  --success: #3fb950;
+  --radius: 12px;
+  --radius-sm: 8px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.6;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+.container { max-width: 880px; margin: 0 auto; padding: 0 20px; }
+
+/* ── Top Bar ── */
+.topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+.topbar .brand { display: flex; align-items: center; gap: 8px; }
+.topbar .brand .logo { font-size: 22px; }
+.topbar .brand h1 { font-size: 18px; font-weight: 600; color: var(--accent); }
+.topbar .nav { display: flex; gap: 16px; align-items: center; }
+.topbar .nav a { color: var(--text-muted); font-size: 14px; }
+.topbar .nav a:hover { color: var(--text); }
+
+/* ── Hero ── */
+.hero { text-align: center; padding: 80px 0 48px; }
+.hero .logo-big { font-size: 72px; display: block; margin-bottom: 12px; }
+.hero h1 { font-size: 44px; font-weight: 700; color: var(--accent); margin: 0 0 10px; }
+.hero .tagline {
+  font-size: 18px; color: var(--text-muted);
+  max-width: 640px; margin: 0 auto 32px; line-height: 1.7;
+}
+.hero .badge { margin-bottom: 24px; }
+.hero .badge img { height: 20px; }
+
+.cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+.cta-primary {
+  display: inline-block;
+  background: var(--accent-dim); color: #fff;
+  padding: 14px 32px; border-radius: var(--radius);
+  font-size: 16px; font-weight: 600;
+  transition: background .15s;
+}
+.cta-primary:hover { background: var(--accent); text-decoration: none; }
+.cta-secondary {
+  display: inline-block;
+  background: var(--bg-tertiary); color: var(--text);
+  padding: 14px 32px; border-radius: var(--radius);
+  font-size: 16px; font-weight: 500;
+  border: 1px solid var(--border);
+  transition: background .15s;
+}
+.cta-secondary:hover { background: var(--border); text-decoration: none; }
+
+/* ── Stats ── */
+.stats {
+  display: flex; gap: 20px; justify-content: center;
+  flex-wrap: wrap; margin: 40px 0;
+  padding: 24px; background: var(--bg-secondary);
+  border: 1px solid var(--border); border-radius: var(--radius);
+}
+.stat-item { text-align: center; padding: 0 16px; }
+.stat-item .num { font-size: 28px; font-weight: 700; color: var(--accent); display: block; }
+.stat-item .label { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+
+/* ── Sections ── */
+.section { margin: 48px 0; }
+.section h2 {
+  font-size: 24px; font-weight: 600; margin: 0 0 20px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+}
+.section h3 { font-size: 16px; font-weight: 600; margin: 20px 0 8px; color: var(--accent); }
+.section p { margin: 8px 0; color: var(--text-muted); }
+
+/* ── Feature Grid ── */
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+.feature-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  transition: border-color .15s;
+}
+.feature-card:hover { border-color: var(--accent); }
+.feature-card .icon { font-size: 24px; margin-bottom: 6px; display: block; }
+.feature-card h3 { font-size: 15px; font-weight: 600; margin: 0 0 4px; color: var(--text); }
+.feature-card p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+
+/* ── Code blocks ── */
+code, pre {
+  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+  font-size: 13px;
+}
+pre {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  overflow-x: auto;
+  color: var(--accent);
+  margin: 8px 0;
+  line-height: 1.5;
+}
+code {
+  background: var(--bg-tertiary);
+  padding: 2px 6px;
+  border-radius: 3px;
+  color: var(--accent);
+}
+
+/* ── Table ── */
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 14px; }
+th, td { padding: 10px 12px; text-align: left; border-bottom: 1px solid var(--border); }
+th { background: var(--bg-secondary); color: var(--text-muted); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: .5px; }
+td { color: var(--text); }
+tr:hover td { background: var(--bg-secondary); }
+
+/* ── Footer ── */
+.footer {
+  text-align: center; padding: 32px 0 24px;
+  border-top: 1px solid var(--border);
+  margin-top: 48px; color: var(--text-muted); font-size: 13px;
+}
+
+@media (max-width: 600px) {
+  .hero h1 { font-size: 28px; }
+  .hero .tagline { font-size: 16px; }
+  .stats { flex-direction: column; align-items: center; }
+  .features { grid-template-columns: 1fr; }
+  pre { font-size: 12px; }
+  table { font-size: 13px; }
+  th, td { padding: 6px 8px; }
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">⚡</span>
+    <h1>Zeno</h1>
+  </div>
+  <nav class="nav">
+    <a href="#features">Features</a>
+    <a href="#install">Install</a>
+    <a href="#usage">Usage</a>
+    <a href="#architecture">Architecture</a>
+    <a href="https://github.com/Architect-Brad/Zeno">GitHub</a>
+  </nav>
+</header>
+
+<div class="container">
+
+<section class="hero">
+  <span class="logo-big">⚡</span>
+  <h1>Zeno</h1>
+  <p class="tagline">
+    An on-device voice assistant with semantic NLU, cross-platform device control,
+    LAN sync, and zero cloud dependencies. No ML frameworks, no data leaving your machine.
+  </p>
+  <div class="badge">
+    <img src="https://github.com/Architect-Brad/Zeno/actions/workflows/ci.yml/badge.svg" alt="CI">
+  </div>
+  <div class="cta-row">
+    <a href="https://github.com/Architect-Brad/Zeno" class="cta-primary">View on GitHub</a>
+    <a href="#install" class="cta-secondary">Quick Install</a>
+    <a href="#usage" class="cta-secondary">Examples</a>
+  </div>
+</section>
+
+<div class="stats">
+  <div class="stat-item"><span class="num">54</span><span class="label">Intent Classes</span></div>
+  <div class="stat-item"><span class="num">9</span><span class="label">Languages</span></div>
+  <div class="stat-item"><span class="num">~22 MB</span><span class="label">RAM Footprint</span></div>
+  <div class="stat-item"><span class="num">48</span><span class="label">Python Files</span></div>
+  <div class="stat-item"><span class="num">53</span><span class="label">Tests</span></div>
+  <div class="stat-item"><span class="num">0</span><span class="label">Cloud Dependencies</span></div>
+</div>
+
+<section id="features" class="section">
+  <h2>Features</h2>
+  <div class="features">
+    <div class="feature-card">
+      <span class="icon">🧠</span><h3>Semantic NLU</h3>
+      <p>Character n-gram intent classifier — 54 classes across 9 languages. Entity extraction, synonym expansion, multi-intent detection, dialog fragments. Pure Python, zero ML deps.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">💻</span><h3>Cross-Platform</h3>
+      <p>Termux/Android, Windows, Linux. Voice I/O, notifications, volume, brightness, screen lock, app launcher. Each platform is a single provider file with mocked tests.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🔒</span><h3>Zero Cloud</h3>
+      <p>All processing on-device. No telemetry, no analytics, no API keys required. Weather via Open-Meteo (free, no key). Search via DuckDuckGo. RSS direct from sources.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🌐</span><h3>9 Languages</h3>
+      <p>English, Spanish, French, German, Hindi, Japanese, Korean, Portuguese, Arabic. Auto-detected from Unicode ranges. All 54 intents translated for each language.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🔄</span><h3>LAN Sync</h3>
+      <p>UDP broadcast discovery, REST push/pull, conflict resolution. No configuration, no mDNS, no cloud. Timers, profile, and conversation context sync across devices.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">⏱️</span><h3>Timers & Alarms</h3>
+      <p>Threading-based scheduling, notification alerts, multi-turn slot-filling. Live countdown in web dashboard and TUI. Cancel or check status at any time.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🏠</span><h3>Smart Home</h3>
+      <p>Home Assistant REST API integration. Control lights, thermostat, door locks, security cameras. Configured via ~/.zeno/home_assistant.json.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🎤</span><h3>Voice Modes</h3>
+      <p>Push-to-talk, wake word, VAD-based native wake, continuous listening. termux-microphone-record or browser Web Speech API. Voice calibration per user profile.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🧩</span><h3>Plugin System</h3>
+      <p>Drop-in Python plugins in ~/.zeno/plugins/. Community registry with --discover. Extends BaseSkill — auto-discovered at import time. No registration needed.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">🖥️</span><h3>Web Dashboard</h3>
+      <p>FastAPI + vanilla JS SPA. Chat interface, voice input, live timer panel, LAN peer discovery, profile editor, contacts API, settings panel. No build step required.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">⌨️</span><h3>Terminal UI</h3>
+      <p>Textual-based TUI with chat log, input bar, live timer panel, status bar, and slash commands. Readline history, ANSI colors, tab completion.</p>
+    </div>
+    <div class="feature-card">
+      <span class="icon">⚡</span><h3>Slash Commands</h3>
+      <p>/w /t /a /v 75 /lights /s query — 20+ shortcuts. Shorthand syntax: 5m pizza → timer, 7am wake → alarm. All flow through the same NLU pipeline.</p>
+    </div>
+  </div>
+</section>
+
+<section id="install" class="section">
+  <h2>Quick Install</h2>
+
+  <h3>Prerequisites</h3>
+  <p>Python 3.10+. Platform-specific tools optional.</p>
+  <pre># Termux/Android
+pkg install termux-api
+# Install Termux:API from F-Droid
+
+# Linux
+sudo apt install espeak-ng notify-send pulseaudio-utils brightnessctl
+
+# Windows
+# No additional tools needed (uses built-in PowerShell COM/WMI)</pre>
+
+  <h3>Install from source</h3>
+  <pre>git clone https://github.com/Architect-Brad/Zeno.git
+cd Zeno/Code
+
+# Core (no dependencies)
+python -m zeno.core.runner
+
+# Web dashboard
+pip install "zeno[web]"
+python -m zeno.web.server
+
+# Terminal UI
+pip install "zeno[tui]"
+python -m zeno.core.runner --tui</pre>
+</section>
+
+<section id="usage" class="section">
+  <h2>Usage Examples</h2>
+
+  <h3>Run Modes</h3>
+  <pre>python -m zeno.core.runner                    # Text mode (readline + colors)
+python -m zeno.core.runner --voice            # Push-to-talk voice
+python -m zeno.core.runner --wake             # Wake word
+python -m zeno.core.runner --native-wake      # VAD-based wake
+python -m zeno.core.runner --tui              # Terminal UI
+python -m zeno.core.runner --discover         # Browse plugins
+python -m zeno.web.server                     # Web dashboard</pre>
+
+  <h3>Natural Language</h3>
+  <pre>what time is it
+what's the weather in London
+5 day forecast
+set an alarm for 7am
+set a 5 minute timer called pizza
+remind me to buy groceries
+turn up the volume
+turn on the lights
+open calculator
+what's 15 * 3 + 7
+define serendipity
+what's in the news</pre>
+
+  <h3>Slash Commands</h3>
+  <pre>/w London           Weather
+/f Paris            Forecast
+/t                  Time
+/d                  Date
+/a 7am wake up      Alarm
+/timer 5m pizza     Timer
+/v 75               Set volume
+/v+ /v- /m          Volume up/down/mute
+/b+ /b-             Brightness
+/lock               Lock screen
+/open calculator    Open app
+/lights on|off      Smart lights
+/n                  News
+/s query            Search</pre>
+
+  <h3>Shorthand Syntax</h3>
+  <pre>5m pizza           5-min timer "pizza"
+10min              10-min timer
+7am wake up        Alarm at 07:00 AM "wake up"</pre>
+</section>
+
+<section id="architecture" class="section">
+  <h2>Architecture</h2>
+  <pre>zeno/
+├── core/              # Core engine
+│   ├── loop.py        # process_input — NLU → Skills → Response
+│   ├── context.py     # Turn history, slot-filling, pronouns
+│   ├── runner.py      # CLI runner, argparse, readline, colors
+│   ├── term.py        # ANSI terminal utilities
+│   ├── profile.py     # User identity, location, OWM key
+│   ├── plugins.py     # Plugin auto-loader
+│   ├── contact_store.py
+│   ├── discover.py    # Plugin registry
+│   └── sync.py        # LAN discovery + sync
+├── nlu/               # Natural Language Understanding
+│   ├── intent.py      # NGramVectorizer, 54 intents, 9 langs
+│   ├── entity.py      # Time, date, duration, names, etc.
+│   ├── synonyms.py    # 50+ word groups
+│   └── pipeline.py    # Preprocess → classify → extract
+├── skills/            # Skill implementations
+│   ├── base.py        # BaseSkill abstract class
+│   ├── time_skill.py / conversation.py / reminders.py
+│   ├── system.py / calculator.py / weather.py / news.py
+│   ├── extras.py / search.py / home_assistant.py
+├── platform/          # Cross-platform providers
+│   ├── __init__.py    # Auto-detection, unified API
+│   └── providers/
+│       ├── base.py / termux.py / windows.py / linux.py / dummy.py
+├── audio/             # TTS/STT adapters
+│   ├── tts.py / stt.py / wake.py
+├── tui/               # Textual terminal UI
+│   └── app.py         # Chat log, input, timer panel
+├── web/               # Web dashboard
+│   ├── server.py / app.py / routes.py / handler.py
+│   └── static/        # index.html (landing), chat.html (SPA), style.css, app.js
+└── memory/            # SQLite persistence
+    └── store.py</pre>
+</section>
+
+<section class="section">
+  <h2>Intent Classification</h2>
+  <p>Character n-grams (size 2–4) with L2-normalized frequency vectors and cosine similarity:</p>
+  <ol style="color:var(--text-muted);margin-left:20px;line-height:2">
+    <li>Text lowercased, stripped, padded with spaces</li>
+    <li>Short texts (&lt;8 chars) repeated 3× for sufficient features</li>
+    <li>k-NN against ~5k vectors across 54 intents × 9 languages</li>
+    <li>Word overlap bonus (+0.12) for non-stop-word matches</li>
+    <li>Context boost (+0.03) during active slot-filling</li>
+    <li>Ambiguity margin (0.06) triggers multi-intent mode</li>
+    <li>Confidence threshold (0.30) rejects low-quality matches</li>
+    <li>DDG fallback at marginal confidence (0.15–0.30)</li>
+  </ol>
+</section>
+
+<section class="section">
+  <h2>Language Support</h2>
+  <table>
+    <tr><th>Language</th><th>Code</th><th>Detection</th></tr>
+    <tr><td>English</td><td>en</td><td>Fallback</td></tr>
+    <tr><td>Spanish</td><td>es</td><td>Explicit or set</td></tr>
+    <tr><td>French</td><td>fr</td><td>Explicit or set</td></tr>
+    <tr><td>German</td><td>de</td><td>Explicit or set</td></tr>
+    <tr><td>Hindi</td><td>hi</td><td>Devanagari range</td></tr>
+    <tr><td>Japanese</td><td>ja</td><td>Hiragana/Katakana range</td></tr>
+    <tr><td>Korean</td><td>ko</td><td>Hangul range</td></tr>
+    <tr><td>Portuguese</td><td>pt</td><td>Explicit or set</td></tr>
+    <tr><td>Arabic</td><td>ar</td><td>Arabic range</td></tr>
+  </table>
+  <p>All 54 intents are translated for every language. Detection is automatic from Unicode ranges; set explicitly via <code>set_language("ja")</code>.</p>
+</section>
+
+<section class="section">
+  <h2>Testing</h2>
+  <pre>pip install pytest
+pytest test_context.py test_platform.py -v</pre>
+  <p>53 tests covering intent classification, entity extraction, multi-turn slot-filling, platform providers (Dummy, Termux, Linux, Windows), platform detection, and function delegation.</p>
+</section>
+
+<footer class="footer">
+  Built by <a href="https://github.com/Architect-Brad">The Architect</a>
+  &middot; MIT License
+  &middot; <a href="https://github.com/Architect-Brad/Zeno">GitHub</a>
+  &middot; <a href="https://architect-brad.github.io/Zeno/">GitHub Pages</a>
+</footer>
+
+</div>
+</body>
+</html>
