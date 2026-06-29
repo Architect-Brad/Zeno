@@ -8,7 +8,7 @@ _SYNONYM_GROUPS: list[set[str]] = [
     {"song", "track", "music", "tune", "playlist", "melody"},
     {"next", "skip", "forward", "advance", "following"},
     {"previous", "back", "prior", "last", "rewind"},
-    {"joke", "funny", "laugh", "humor", "comedy", "riddle"},
+    {"joke", "funny", "laugh", "humor", "comedy"},
     {"story", "tale", "narrative"},
 
     # Smart home

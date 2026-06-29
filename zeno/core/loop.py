@@ -19,6 +19,26 @@ from zeno.skills.news import NewsSkill
 from zeno.skills.extras import ExtrasSkill
 from zeno.skills.home_assistant import HomeAssistantSkill
 from zeno.skills.search import SearchSkill, try_ddg_fallback
+from zeno.skills.joke import JokeSkill
+from zeno.skills.riddle import RiddleSkill
+from zeno.skills.coin import CoinSkill
+from zeno.skills.dice import DiceSkill
+from zeno.skills.notes import NotesSkill
+from zeno.skills.notebook import NotebookSkill
+from zeno.skills.clear import ClearSkill
+from zeno.skills.quote import QuoteSkill
+from zeno.skills.fact import FactSkill
+from zeno.skills.currency import CurrencySkill
+from zeno.skills.converter import ConverterSkill
+from zeno.skills.timezone import TimezoneSkill
+from zeno.skills.sleep import SleepSkill
+from zeno.skills.fan import FanSkill
+from zeno.skills.scene import SceneSkill
+from zeno.skills.countdown import CountdownSkill
+from zeno.skills.shuffle import ShuffleSkill
+from zeno.skills.repeat import RepeatSkill
+from zeno.skills.playlist import PlaylistSkill
+from zeno.skills.lyrics import LyricsSkill
 from zeno.response.engine import pick
 
 CONFIDENCE_THRESHOLD = 0.30
@@ -37,6 +57,26 @@ _BUILTIN_SKILLS = [
     ExtrasSkill(),
     HomeAssistantSkill(),
     SearchSkill(),
+    JokeSkill(),
+    RiddleSkill(),
+    CoinSkill(),
+    DiceSkill(),
+    NotesSkill(),
+    NotebookSkill(),
+    ClearSkill(),
+    QuoteSkill(),
+    FactSkill(),
+    CurrencySkill(),
+    ConverterSkill(),
+    TimezoneSkill(),
+    SleepSkill(),
+    FanSkill(),
+    SceneSkill(),
+    CountdownSkill(),
+    ShuffleSkill(),
+    RepeatSkill(),
+    PlaylistSkill(),
+    LyricsSkill(),
 ]
 
 _PLUGIN_SKILLS: list = []
