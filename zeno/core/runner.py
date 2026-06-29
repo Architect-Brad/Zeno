@@ -23,6 +23,7 @@ from zeno.memory.store import get_store
 
 _VERSION = "1.0.0"
 _WAKE_WORDS = ("zeno", "hey")
+_DAEMON_PORT = 8080
 
 
 # ── readline integration ─────────────────────────────────────────────
@@ -352,6 +353,15 @@ async def run_voice_loop(require_wake: bool = False, native_wake: bool = False):
             continue
 
 
+# ── Daemon proxy ──────────────────────────────────────────────────────
+
+def _proxy_through_daemon(text: str, daemon_port: int) -> str | None:
+    from zeno.core.daemon import is_running, proxy_request
+    if not is_running():
+        return None
+    return proxy_request(text, daemon_port)
+
+
 # ── Text loop ─────────────────────────────────────────────────────────
 
 def _handle_slash_or_shorthand(text: str, context: Context) -> str | None:
@@ -379,10 +389,20 @@ def _handle_slash_or_shorthand(text: str, context: Context) -> str | None:
     return None
 
 
-def run_text_loop():
+def run_text_loop(daemon_port: int | None = None):
+    # Auto-proxy: if daemon is running, forward through it
+    from zeno.core.daemon import is_running, proxy_request
+    if daemon_port is None:
+        daemon_port = _DAEMON_PORT
+    using_daemon = is_running()
+
+    if using_daemon:
+        print(f"{zeno_prefix()} Text mode {dim('(proxied through daemon)')}. {dim('/help for commands, /exit to quit.')}")
+    else:
+        print(f"{zeno_prefix()} Text mode. {dim('Type /help for commands, /exit to quit.')}")
+
     _setup_readline()
-    context = Context()
-    print(f"{zeno_prefix()} Text mode. {dim('Type /help for commands, /exit to quit.')}")
+    context = Context() if not using_daemon else None
 
     while True:
         try:
@@ -398,15 +418,21 @@ def run_text_loop():
             print(f"{zeno_prefix()} Goodbye!")
             break
 
-        # Try slash command or shorthand first
-        handled = _handle_slash_or_shorthand(raw, context)
-        if handled is not None:
-            if handled:
-                print(f"{zeno_prefix()} {green(handled)}")
-            continue
+        if using_daemon:
+            response = proxy_request(raw, daemon_port)
+            if response is None:
+                print(f"{error_prefix()} Daemon unreachable. {dim('Falling back to local processing.')}")
+                using_daemon = False
+                context = Context()
+                response = process_input(raw, context)
+        else:
+            handled = _handle_slash_or_shorthand(raw, context)
+            if handled is not None:
+                if handled:
+                    print(f"{zeno_prefix()} {green(handled)}")
+                continue
+            response = process_input(raw, context)
 
-        # Normal NLU processing
-        response = process_input(raw, context)
         print(f"{zeno_prefix()} {green(response)}")
 
 
@@ -432,13 +458,16 @@ def _build_parser() -> argparse.ArgumentParser:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog=(
             "Examples:\n"
-            "  python -m zeno.core.runner                Text mode\n"
-            "  python -m zeno.core.runner --voice         Push-to-talk voice\n"
-            "  python -m zeno.core.runner --wake          Wake word activation\n"
-            "  python -m zeno.core.runner --native-wake   VAD-based wake\n"
-            "  python -m zeno.core.runner --tui           Terminal UI\n"
-            "  python -m zeno.core.runner --discover      Browse plugin registry\n"
-            "  python -m zeno.web.server                  Web dashboard\n"
+            "  python -m zeno.core.runner                  Text mode\n"
+            "  python -m zeno.core.runner --voice           Push-to-talk voice\n"
+            "  python -m zeno.core.runner --wake            Wake word activation\n"
+            "  python -m zeno.core.runner --native-wake     VAD-based wake\n"
+            "  python -m zeno.core.runner --tui             Terminal UI\n"
+            "  python -m zeno.core.runner --daemon          Start background daemon\n"
+            "  python -m zeno.core.runner --stop            Stop daemon\n"
+            "  python -m zeno.core.runner --status          Daemon status\n"
+            "  python -m zeno.core.runner --discover        Browse plugin registry\n"
+            "  python -m zeno.web.server                    Web dashboard\n"
             "\n"
             "In text mode, type /help for slash commands."
         ),
@@ -469,6 +498,26 @@ def _build_parser() -> argparse.ArgumentParser:
         help="Launch the Textual terminal UI",
     )
     parser.add_argument(
+        "--daemon", action="store_true",
+        help=f"Start background daemon (web server on port {_DAEMON_PORT})",
+    )
+    parser.add_argument(
+        "--stop", action="store_true",
+        help="Stop the running daemon",
+    )
+    parser.add_argument(
+        "--status", action="store_true",
+        help="Show daemon status",
+    )
+    parser.add_argument(
+        "--daemon-port", type=int, default=_DAEMON_PORT,
+        help=f"Port for daemon (default: {_DAEMON_PORT})",
+    )
+    parser.add_argument(
+        "--no-sync", action="store_true",
+        help="Disable LAN sync for daemon mode",
+    )
+    parser.add_argument(
         "--version", action="version",
         version=f"Zeno v{_VERSION}",
         help="Show version and exit",
@@ -490,6 +539,29 @@ def main():
         discover(name=None if args.discover == "__list__" else args.discover)
         sys.exit(0)
 
+    # ── Daemon management ──
+    if args.stop:
+        from zeno.core.daemon import stop
+        ok, msg = stop()
+        print(f"{zeno_prefix()} {msg}")
+        sys.exit(0 if ok else 1)
+
+    if args.status:
+        from zeno.core.daemon import status as daemon_status
+        s = daemon_status()
+        if s["running"]:
+            print(f"{zeno_prefix()} Daemon is running {dim(f'(PID {s["pid"]}, port {s["port"] or "?"})')}")
+        else:
+            print(f"{zeno_prefix()} Daemon is not running")
+        sys.exit(0)
+
+    if args.daemon:
+        from zeno.core.daemon import start
+        ok, msg = start(port=args.daemon_port, sync=not args.no_sync)
+        print(f"{zeno_prefix()} {msg}")
+        sys.exit(0 if ok else 1)
+
+    # ── Interactive modes ──
     if args.tui:
         run_tui()
         sys.exit(0)
@@ -500,7 +572,7 @@ def main():
             native_wake=args.native_wake,
         ))
     else:
-        run_text_loop()
+        run_text_loop(daemon_port=args.daemon_port)
 
 
 if __name__ == "__main__":

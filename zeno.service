@@ -1,0 +1,26 @@
+[Unit]
+Description=Zeno — On-Device Voice Assistant
+Documentation=https://github.com/Architect-Brad/Zeno
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=exec
+ExecStart=python3 -m zeno.core.runner --daemon
+ExecStop=python3 -m zeno.core.runner --stop
+ExecReload=python3 -m zeno.core.runner --stop && python3 -m zeno.core.runner --daemon
+Restart=on-failure
+RestartSec=10
+
+# Security
+NoNewPrivileges=true
+ProtectHome=tmpfs
+ProtectSystem=strict
+PrivateTmp=true
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=default.target
