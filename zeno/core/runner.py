@@ -20,6 +20,7 @@ from zeno.core.loop import process_input
 from zeno.audio.stt import listen
 from zeno.audio.tts import speak
 from zeno.memory.store import get_store
+from zeno.core.proactive import get_engine as get_proactive
 
 _VERSION = "1.0.0"
 _WAKE_WORDS = ("zeno", "hey")
@@ -305,6 +306,13 @@ async def listen_for_wake(timeout: int = 15) -> str | None:
 async def run_voice_interaction(context: Context,
                                 require_wake: bool = False,
                                 native_wake: bool = False) -> str | None:
+    # Check for proactive suggestion first
+    try:
+        proactive = get_proactive().check()
+        if proactive:
+            await speak_async(proactive)
+    except Exception:
+        pass
     if native_wake:
         from zeno.audio.wake import wait_for_wake_word
         text = await asyncio.get_running_loop().run_in_executor(
@@ -403,6 +411,16 @@ def run_text_loop(daemon_port: int | None = None):
 
     _setup_readline()
     context = Context() if not using_daemon else None
+
+    # Show proactive suggestion at start
+    if not using_daemon:
+        try:
+            from zeno.core.proactive import get_engine as get_proactive
+            suggestion = get_proactive().check()
+            if suggestion:
+                print(f"{zeno_prefix()} {cyan(suggestion)}")
+        except Exception:
+            pass
 
     while True:
         try:

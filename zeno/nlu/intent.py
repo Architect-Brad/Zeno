@@ -268,17 +268,19 @@ TRAINING_DATA: dict[str, list[str]] = {
     "send_message": [
         "send a message", "send a text", "text someone", "send message to",
         "send sms", "send a text message", "message", "drop a message",
-        "send a quick message", "text",
+        "send a quick message", "text", "message someone",
+        "compose a message", "write a message",
     ],
     "make_call": [
         "make a call", "call", "phone", "call someone", "make a phone call",
         "dial", "place a call", "call a contact", "ring someone",
-        "give them a call",
+        "give them a call", "call a number", "dial a number",
     ],
     "check_email": [
         "check email", "read my emails", "check my inbox",
         "do i have any emails", "check mail", "open email",
         "show my emails", "unread emails", "email status",
+        "any new emails", "read my latest emails", "check my mail",
     ],
     "read_notifications": [
         "read notifications", "check notifications", "show notifications",
@@ -295,16 +297,19 @@ TRAINING_DATA: dict[str, list[str]] = {
         "find nearby", "what's near me", "find a place", "search nearby",
         "nearby restaurants", "places near me", "find close by",
         "what's around here", "nearby places", "what is near me",
+        "find me a place", "search for places", "look for nearby",
     ],
     "traffic_check": [
         "check traffic", "how is the traffic", "traffic status",
         "traffic report", "is there traffic", "traffic conditions",
         "how bad is traffic", "traffic today", "traffic update",
+        "traffic on my route", "any traffic jams", "traffic near me",
     ],
     "define_word": [
         "define", "what does this word mean", "definition of",
         "what is the meaning of", "dictionary", "define the word",
         "meaning of", "word definition", "what does that mean",
+        "look up a word", "define a word", "what does word mean",
     ],
     "translate_phrase": [
         "translate", "how do you say", "translate to", "what is in spanish",
@@ -315,6 +320,7 @@ TRAINING_DATA: dict[str, list[str]] = {
         "check battery", "battery level", "how much battery",
         "battery status", "what is my battery at", "battery percentage",
         "how is my battery", "remaining battery", "power left",
+        "battery left", "how much charge", "battery remaining",
     ],
     "flashlight_on": [
         "turn on flashlight", "flashlight on", "turn the flashlight on",
@@ -330,6 +336,7 @@ TRAINING_DATA: dict[str, list[str]] = {
         "take a screenshot", "screenshot", "capture screen",
         "take screenshot", "screen capture", "screen shot",
         "capture the screen", "snap the screen",
+        "grab a screenshot", "save screenshot", "take a screen grab",
     ],
     "wifi_on": [
         "turn on wifi", "wifi on", "enable wifi", "turn the wifi on",
@@ -351,7 +358,9 @@ TRAINING_DATA: dict[str, list[str]] = {
     "set_volume_exact": [
         "set volume", "set volume to", "volume level", "set the volume",
         "volume to", "change volume to", "adjust volume to",
-        "turn volume to", "set volume at",
+        "turn volume to", "set volume at", "change the volume level",
+        "set the volume level", "put volume at", "set sound to",
+        "adjust the volume", "set my volume to",
     ],
     "brightness_up": [
         "brightness up", "increase brightness", "make it brighter",
@@ -424,15 +433,21 @@ TRAINING_DATA: dict[str, list[str]] = {
     "sleep_timer": [
         "set sleep timer", "sleep timer", "turn off in",
         "sleep in", "set a sleep timer", "go to sleep in",
+        "start sleep timer", "timer to turn off", "shut down in",
+        "power off in", "turn off after",
     ],
     "fan_speed": [
         "set fan speed", "fan speed", "change fan speed",
         "adjust fan", "turn up fan", "turn down fan",
-        "set fan to",
+        "set fan to", "set the fan speed", "control the fan",
+        "adjust the fan speed", "change the fan setting",
+        "make the fan faster", "make the fan slower",
     ],
     "scene_activate": [
         "activate scene", "set scene", "change scene",
         "switch to scene", "enter scene mode", "scene",
+        "set the scene", "switch scene", "load a scene",
+        "select scene", "apply scene",
     ],
     "countdown_event": [
         "countdown to", "how many days until", "days until",
@@ -441,20 +456,34 @@ TRAINING_DATA: dict[str, list[str]] = {
     "shuffle_music": [
         "shuffle", "shuffle music", "shuffle playlist",
         "shuffle my music", "play on shuffle", "random play",
+        "shuffle mode", "play in shuffle", "turn on shuffle",
+        "mix it up", "randomize playlist",
     ],
     "repeat_mode": [
         "repeat", "repeat mode", "repeat one",
         "repeat all", "toggle repeat", "repeat this song",
-        "loop this",
+        "loop this", "loop mode", "play on repeat",
+        "turn on repeat", "repeat the playlist",
     ],
     "play_playlist": [
         "play my playlist", "play playlist", "start playlist",
         "play a playlist", "play list", "open playlist",
+        "choose a playlist", "select playlist", "load playlist",
+        "add playlist", "play from my playlist",
     ],
     "lyrics_search": [
         "find lyrics", "lyrics for", "song lyrics",
         "what are the lyrics to", "show me the lyrics for",
-        "lyrics of", "get lyrics",
+        "lyrics of", "get lyrics", "look up lyrics",
+        "find song lyrics", "show lyrics", "tell me the lyrics",
+    ],
+    "knowledge_query": [
+        "what is", "tell me about", "what do you know about",
+        "describe", "who is", "facts about", "what's",
+        "what can you tell me about", "knowledge",
+        "do you know anything about", "i want to know about",
+        "can you tell me about", "explain", "what are",
+        "give me information about",
     ],
 }
 
@@ -489,6 +518,114 @@ def _cosine_similarity(a: dict[str, float], b: dict[str, float]) -> float:
     dot = sum(a[k] * b[k] for k in intersection)
     # Both vectors are unit-normalized, so dot = cosine
     return dot
+
+
+def _idf_weights(training_data: dict[str, list[dict[str, float]]]) -> dict[str, float]:
+    """Compute inverse document frequency for n-grams across intents."""
+    intent_count = len(training_data)
+    doc_freq: dict[str, int] = {}
+    for vectors in training_data.values():
+        seen: set[str] = set()
+        for vec in vectors:
+            seen.update(vec.keys())
+        for gram in seen:
+            doc_freq[gram] = doc_freq.get(gram, 0) + 1
+    import math
+    return {
+        gram: math.log(1 + intent_count / (1 + freq))
+        for gram, freq in doc_freq.items()
+    }
+
+
+# ---------------------------------------------------------------------------
+# Intent groups: semantic categories for coherence scoring
+# ---------------------------------------------------------------------------
+
+INTENT_GROUPS: dict[str, list[str]] = {
+    "weather": ["weather_query", "weather_forecast"],
+    "lights": ["lights_on", "lights_off"],
+    "climate": ["set_thermostat"],
+    "security": ["lock_door", "security_check"],
+    "media": ["play_music", "next_track", "previous_track", "pause_music",
+              "resume_music", "shuffle_music", "repeat_mode", "play_playlist"],
+    "notes": ["take_note", "read_notes", "clear_notes"],
+    "conversation": ["greeting", "farewell", "identity_query", "thanks",
+                     "affirm", "deny"],
+    "timer": ["set_timer", "check_timer_status", "stop_timer", "sleep_timer"],
+    "alarm": ["set_alarm"],
+    "reminder": ["set_reminder"],
+    "system": ["system_lock", "volume_up", "volume_down", "volume_mute",
+               "set_volume_exact", "brightness_up", "brightness_down"],
+    "connectivity": ["wifi_on", "wifi_off"],
+    "calculator": ["calculate"],
+    "navigation": ["get_directions", "find_place", "traffic_check"],
+    "fun": ["joke", "riddle", "fun_request"],
+    "chance": ["flip_coin", "roll_dice"],
+    "knowledge": ["knowledge_query", "define_word", "lyrics_search"],
+    "quote_fact": ["quote", "random_fact"],
+    "currency": ["currency_convert"],
+    "convert": ["unit_convert", "currency_convert"],
+    "time_date": ["time_query", "date_query", "timezone_info", "countdown_event"],
+    "home": ["lights_on", "lights_off", "set_thermostat", "lock_door",
+             "security_check", "fan_speed", "scene_activate"],
+    "app_control": ["open_app", "screenshot"],
+    "communication": ["send_message", "make_call", "check_email",
+                      "read_notifications"],
+    "flashlight": ["flashlight_on", "flashlight_off"],
+    "music_control": ["play_music", "next_track", "previous_track",
+                      "pause_music", "resume_music"],
+    "accessibility": ["brightness_up", "brightness_down"],
+}
+
+_INTENT_TO_GROUP: dict[str, str] = {}
+for _g, _members in INTENT_GROUPS.items():
+    for _m in _members:
+        _INTENT_TO_GROUP[_m] = _g
+
+# Intent hierarchy: fallback chains for ambiguous/similar intents
+# All targets must be real intent keys with training data.
+_INTENT_FALLBACK: dict[str, list[str]] = {
+    "joke": ["fun_request", "greeting"],
+    "riddle": ["joke", "fun_request"],
+    "flip_coin": ["roll_dice", "fun_request"],
+    "roll_dice": ["flip_coin", "fun_request"],
+    "take_note": ["read_notes"],
+    "read_notes": ["take_note"],
+    "clear_notes": ["take_note", "read_notes"],
+    "quote": ["random_fact"],
+    "random_fact": ["quote"],
+    "currency_convert": ["calculate", "knowledge_query"],
+    "unit_convert": ["calculate", "currency_convert"],
+    "timezone_info": ["time_query", "knowledge_query"],
+    "sleep_timer": ["set_timer", "check_timer_status"],
+    "fan_speed": ["set_thermostat"],
+    "scene_activate": ["lights_on", "lights_off"],
+    "countdown_event": ["set_timer", "date_query"],
+    "shuffle_music": ["play_music"],
+    "repeat_mode": ["play_music"],
+    "play_playlist": ["play_music"],
+    "lyrics_search": ["knowledge_query", "define_word"],
+    "fun_request": ["joke", "greeting"],
+    "play_music": ["next_track", "previous_track"],
+    "lights_on": ["lights_off"],
+    "lights_off": ["lights_on"],
+    "set_thermostat": ["fan_speed"],
+    "lock_door": ["security_check"],
+    "weather_query": ["weather_forecast"],
+    "weather_forecast": ["weather_query"],
+    "brightness_up": ["brightness_down"],
+    "brightness_down": ["brightness_up"],
+    "volume_up": ["volume_down"],
+    "volume_down": ["volume_up"],
+    "wifi_on": ["wifi_off"],
+    "wifi_off": ["wifi_on"],
+    "flashlight_on": ["flashlight_off"],
+    "flashlight_off": ["flashlight_on"],
+    "affirm": ["deny"],
+    "deny": ["affirm"],
+    "send_message": ["make_call"],
+    "make_call": ["send_message"],
+}
 
 
 class IntentClassifier:
@@ -609,6 +746,212 @@ class IntentClassifier:
         return sorted(scores.items(), key=lambda x: -x[1])[:top_n]
 
 
+_STOP_WORDS = {"a", "an", "the", "in", "at", "on",
+               "to", "for", "of", "is", "it", "and",
+               "or", "my", "i", "me", "you", "do",
+               "does", "can", "will", "with", "this",
+               "that", "please", "want", "need"}
+
+
+class EnhancedClassifier(IntentClassifier):
+    """
+    Enhanced intent classifier with:
+    - TF-IDF weighted n-grams (down-weights common n-grams)
+    - Subword token overlap scoring
+    - Intent hierarchy fallback chains
+    - Better ambiguity resolution
+    """
+
+    def __init__(self, ngram_range: tuple[int, int] = (2, 4)):
+        super().__init__(ngram_range)
+        self._idf: dict[str, float] = {}
+        self._subword_vocab: dict[str, set[str]] = {}
+        self._word_examples: dict[str, list[dict[str, float]]] = {}
+
+    @staticmethod
+    def _word_vec(text: str) -> dict[str, float]:
+        """Word-level unigram + bigram vectorizer."""
+        words = re.findall(r'\w+', text.lower())
+        grams: dict[str, float] = {}
+        for w in words:
+            if len(w) > 1:
+                grams[f"w:{w}"] = grams.get(f"w:{w}", 0) + 1
+        for i in range(len(words) - 1):
+            bigram = f"b:{words[i]} {words[i+1]}"
+            grams[bigram] = grams.get(bigram, 0) + 1
+        norm = math.sqrt(sum(v * v for v in grams.values()))
+        if norm:
+            for k in grams:
+                grams[k] /= norm
+        return grams
+
+    def fit(self, data: dict[str, list[str]] | None = None):
+        training = data or TRAINING_DATA
+        self._phrase_vocab = {}
+        self._subword_vocab = {}
+        self._word_examples = {}
+        for intent, phrases in training.items():
+            vectors = []
+            word_vecs = []
+            words = set()
+            subwords: set[str] = set()
+            # Use original phrases only — synonym expansion happens at predict time
+            for phrase in phrases:
+                vectors.append(self.vectorizer.vectorize(phrase))
+                word_vecs.append(self._word_vec(phrase))
+                for w in re.findall(r'\w+', phrase.lower()):
+                    if len(w) > 2:
+                        words.add(w)
+                    for n in (3, 4):
+                        for i in range(len(w) - n + 1):
+                            subwords.add(w[i:i + n])
+            self.examples[intent] = vectors
+            self._word_examples[intent] = word_vecs
+            self._phrase_vocab[intent] = words
+            self._subword_vocab[intent] = subwords
+        self._idf = _idf_weights(self.examples)
+        self._is_fit = True
+
+    def _score(self, query_vec: dict[str, float], intent: str,
+               query_word_vec: dict[str, float] | None = None) -> float:
+        best = 0.0
+        for example_vec in self.examples.get(intent, []):
+            sim = _cosine_similarity(query_vec, example_vec)
+            if sim > best:
+                best = sim
+        idf_boost = 0.0
+        query_grams = set(query_vec.keys())
+        for vec in self.examples.get(intent, []):
+            overlap = query_grams & set(vec.keys())
+            if overlap:
+                idf_boost = max(
+                    idf_boost,
+                    sum(self._idf.get(g, 1.0) for g in overlap) / len(overlap) * 0.02
+                )
+        # Word-level similarity bonus
+        word_bonus = 0.0
+        if query_word_vec:
+            best_word = 0.0
+            for wv in self._word_examples.get(intent, []):
+                sim = _cosine_similarity(query_word_vec, wv)
+                if sim > best_word:
+                    best_word = sim
+            word_bonus = best_word * 0.15
+        return best + idf_boost + word_bonus
+
+    def predict(
+        self,
+        text: str,
+        context_intent: str | None = None,
+        threshold: float = 0.30,
+        ambiguity_margin: float = 0.06,
+    ) -> IntentResult:
+        if not self._is_fit:
+            self.fit()
+
+        query_vec = self.vectorizer.vectorize(text)
+        query_word_vec = self._word_vec(text)
+        scores: dict[str, float] = {}
+        for intent in self.examples:
+            scores[intent] = self._score(query_vec, intent, query_word_vec)
+
+        if not scores:
+            return IntentResult(intent="unknown", confidence=0.0, raw=text)
+
+        query_subwords: set[str] = set()
+        for w in re.findall(r'\w+', text.lower()):
+            for n in (3, 4):
+                for i in range(len(w) - n + 1):
+                    query_subwords.add(w[i:i + n])
+        if query_subwords:
+            for intent in scores:
+                sw = self._subword_vocab.get(intent, set())
+                if sw:
+                    overlap = len(query_subwords & sw)
+                    total = len(query_subwords | sw)
+                    if total > 0:
+                        scores[intent] += (overlap / total) * 0.08
+
+        query_words = set(w.lower() for w in re.findall(r'\w+', text)
+                          if w.lower() not in _STOP_WORDS)
+        if query_words:
+            for intent in scores:
+                vocab = self._phrase_vocab.get(intent, set())
+                if vocab:
+                    overlap = len(query_words & vocab) / len(query_words)
+                    scores[intent] += overlap * 0.12
+
+        if context_intent and context_intent in scores:
+            scores[context_intent] += 0.04
+
+        ranked = sorted(scores.items(), key=lambda x: -x[1])
+        best_intent, best_score = ranked[0]
+        second_intent, second_score = ranked[1] if len(ranked) > 1 else ("unknown", 0.0)
+
+        # --- Group-coherence bonus ---
+        # If top-2 intents share a group, reduce ambiguity penalty
+        best_group = _INTENT_TO_GROUP.get(best_intent)
+        second_group = _INTENT_TO_GROUP.get(second_intent)
+        group_coherent = best_group and second_group and best_group == second_group
+        effective_margin = ambiguity_margin * 0.6 if group_coherent else ambiguity_margin
+
+        margin = best_score - second_score
+
+        if best_score < threshold:
+            if context_intent and best_intent != context_intent:
+                fallback = self._try_fallback(best_intent, context_intent, scores, text)
+                if fallback:
+                    return fallback
+            return IntentResult(intent="unknown", confidence=best_score, raw=text)
+
+        is_multi = False
+        if margin < effective_margin and second_score > threshold:
+            is_multi = True
+
+        return IntentResult(
+            intent=best_intent,
+            confidence=best_score,
+            raw=text,
+            is_multi=is_multi,
+            secondary_intent=second_intent if is_multi else None,
+            secondary_confidence=second_score if is_multi else 0.0,
+        )
+
+    def _try_fallback(self, primary: str, fallback_intent: str,
+                      scores: dict[str, float],
+                      query_text: str = "") -> IntentResult | None:
+        # Group-based fallback: same group as context intent
+        p_group = _INTENT_TO_GROUP.get(primary)
+        f_group = _INTENT_TO_GROUP.get(fallback_intent)
+        if p_group and f_group and p_group == f_group:
+            fb_score = scores.get(fallback_intent, 0.0)
+            if fb_score > 0.15:
+                return IntentResult(
+                    intent=fallback_intent,
+                    confidence=fb_score,
+                    raw=query_text or primary,
+                )
+        # Chain-based fallback: explicit fallback list
+        chain = _INTENT_FALLBACK.get(primary, [])
+        if fallback_intent in chain:
+            fb_score = scores.get(fallback_intent, 0.0)
+            if fb_score > 0.2:
+                return IntentResult(
+                    intent=fallback_intent,
+                    confidence=fb_score,
+                    raw=query_text or primary,
+                )
+        for fb in chain:
+            fb_score = scores.get(fb, 0.0)
+            if fb_score > 0.25:
+                return IntentResult(
+                    intent=fb,
+                    confidence=fb_score,
+                    raw=query_text or primary,
+                )
+        return None
+
+
 # ---------------------------------------------------------------------------
 # Multi-language support — translated training data
 # ---------------------------------------------------------------------------
@@ -678,6 +1021,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "repeat_mode": ["repetir", "modo repetición", "repite esta canción"],
         "play_playlist": ["reproduce mi lista", "mi playlist", "abre playlist"],
         "lyrics_search": ["busca letras", "letra de", "lyrics de"],
+        "knowledge_query": ["qué sabes sobre", "dime sobre", "qué es", "quién es", "conoces"],
     },
     "fr": {
         "greeting": ["bonjour", "salut", "bonsoir", "coucou", "hello", "salut zeno"],
@@ -744,6 +1088,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "repeat_mode": ["répéter", "mode répétition", "répète cette chanson"],
         "play_playlist": ["joue ma playlist", "ma liste", "ouvre la playlist"],
         "lyrics_search": ["cherche paroles", "paroles de", "les paroles de"],
+        "knowledge_query": ["que sais-tu sur", "parle-moi de", "qu'est-ce que", "qui est", "connais-tu"],
     },
     "de": {
         "greeting": ["hallo", "guten morgen", "guten tag", "guten abend", "servus", "hallo zeno", "moin"],
@@ -810,6 +1155,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "repeat_mode": ["wiederholen", "wiederholungsmodus", "titel wiederholen"],
         "play_playlist": ["spiele playlist", "starte playlist", "öffne playlist"],
         "lyrics_search": ["songtext suchen", "text von", "liedtext zu"],
+        "knowledge_query": ["was ist", "erzähl mir von", "wer ist", "was weißt du über", "beschreibe"],
     },
     "hi": {
         "greeting": ["नमस्ते", "नमस्कार", "हैलो", "क्या हाल है", "हेलो ज़ेनो"],
@@ -876,6 +1222,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "repeat_mode": ["दोहराओ", "रिपीट मोड", "फिर से चलाओ"],
         "play_playlist": ["प्लेलिस्ट चलाओ", "मेरी सूची चलाओ", "प्लेलिस्ट खोलो"],
         "lyrics_search": ["गीत खोजो", "बोल दिखाओ", "गाने के बोल"],
+        "knowledge_query": ["क्या है", "बताओ", "कौन है", "जानकारी दो", "तुम क्या जानते हो"],
     },
     "ja": {
         "greeting": ["こんにちは", "やあ", "おはよう", "こんばんは", "ゼノ", "ヘイ"],
@@ -942,6 +1289,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "repeat_mode": ["リピート", "繰り返し", "リピートモード"],
         "play_playlist": ["プレイリスト再生", "マイリスト", "プレイリスト"],
         "lyrics_search": ["歌詞を探して", "歌詞表示", "歌詞"],
+        "knowledge_query": ["とは何ですか", "について教えて", "誰ですか", "知っていますか"],
     },
     "ko": {
         "greeting": ["안녕", "안녕하세요", "헤이", "좋은 아침", "제노"],
@@ -1008,6 +1356,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "repeat_mode": ["반복", "반복 재생", "한 곡 반복"],
         "play_playlist": ["플레이리스트 재생", "내 리스트", "플레이리스트"],
         "lyrics_search": ["가사 검색", "가사 보여 줘", "노래 가사"],
+        "knowledge_query": ["무엇인가요", "에 대해 알려줘", "누구예요", "알고 있어"],
     },
     "pt": {
         "greeting": ["olá", "oi", "bom dia", "boa tarde", "boa noite", "hey zeno", "e aí"],
@@ -1074,6 +1423,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "repeat_mode": ["repetir", "modo repetição", "repita esta música"],
         "play_playlist": ["tocar playlist", "minha lista", "abra playlist"],
         "lyrics_search": ["procurar letras", "letra de", "lyrics de"],
+        "knowledge_query": ["o que é", "fale sobre", "quem é", "o que sabe sobre", "conhece"],
     },
     "ar": {
         "greeting": ["مرحبا", "السلام عليكم", "أهلاً", "صباح الخير", "مساء الخير", "هاي"],
@@ -1140,6 +1490,7 @@ LANGUAGE_PHRASES: dict[str, dict[str, list[str]]] = {
         "repeat_mode": ["تكرار", "وضع التكرار", "كرر هذه الأغنية"],
         "play_playlist": ["شغل قائمتي", "قائمة التشغيل", "افتح القائمة"],
         "lyrics_search": ["ابحث عن كلمات", "كلمات الأغنية", "كلمات"],
+        "knowledge_query": ["ما هو", "أخبرني عن", "من هو", "ماذا تعرف عن", "هل تعرف"],
     },
 }
 
@@ -1197,21 +1548,23 @@ def _build_merged() -> dict[str, list[str]]:
     return merged
 
 
-def get_classifier(language: str | None = None) -> IntentClassifier:
+def get_classifier(language: str | None = None, enhanced: bool = True) -> IntentClassifier:
     global _classifier, _current_language, _all_langs_merged
     lang = language or _current_language
 
     if _classifier is not None and lang == _current_language:
         return _classifier
 
+    cls = EnhancedClassifier if enhanced else IntentClassifier
+
     if lang == "auto":
         if _all_langs_merged is None:
             _all_langs_merged = _build_merged()
-        _classifier = IntentClassifier()
+        _classifier = cls()
         _classifier.fit(_all_langs_merged)
     else:
         data = _merge_language_data(TRAINING_DATA, lang)
-        _classifier = IntentClassifier()
+        _classifier = cls()
         _classifier.fit(data)
 
     _current_language = lang

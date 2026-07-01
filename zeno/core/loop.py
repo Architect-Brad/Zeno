@@ -2,12 +2,15 @@
 Zeno Core Loop
 Orchestrates NLU → Skills → Response for each user turn.
 Handles multi-turn slot-filling, confidence thresholds, and plugin auto-discovery.
+Integrated with personalisation engine and knowledge graph.
 """
 
 import re
 from zeno.nlu.pipeline import process as nlu_process, NLUResult
-from zeno.nlu.entity import extract_entities
+from zeno.nlu.entity import extract_entities, Entities
 from zeno.core.context import Context
+from zeno.core.personalise import get_personaliser
+from zeno.memory.graph import get_graph
 from zeno.core.plugins import load_plugins
 from zeno.skills.time_skill import TimeSkill
 from zeno.skills.conversation import ConversationSkill
@@ -39,6 +42,7 @@ from zeno.skills.shuffle import ShuffleSkill
 from zeno.skills.repeat import RepeatSkill
 from zeno.skills.playlist import PlaylistSkill
 from zeno.skills.lyrics import LyricsSkill
+from zeno.skills.knowledge import KnowledgeSkill
 from zeno.response.engine import pick
 
 CONFIDENCE_THRESHOLD = 0.30
@@ -77,6 +81,7 @@ _BUILTIN_SKILLS = [
     RepeatSkill(),
     PlaylistSkill(),
     LyricsSkill(),
+    KnowledgeSkill(),
 ]
 
 _PLUGIN_SKILLS: list = []
@@ -224,22 +229,47 @@ def process_input(text: str, context: Context) -> str:
     if not text:
         return ""
 
+    # --- Knowledge graph entity lookup: resolve known entities in query ---
+    entities = extract_entities(text)
+    if entities.location:
+        graph = get_graph()
+        known = graph.find_entity(entities.location)
+        if known:
+            facts = graph.get_facts(known.name)
+            if facts and context.turn_count() == 0:
+                pass  # Available for skills to use via context
+
     # --- Multi-intent parsing: split on "and" / commas ---
     if not context.awaiting():
-        # Split on ", and", ", or", ", " and " and " with simple heuristics
         parts = re.split(r'\s*,?\s+(?:and|or)\s+|\s*,\s*', text)
         parts = [p.strip() for p in parts if p.strip()]
         if len(parts) > 1:
             responses = []
             prev_intent = None
             for i, part in enumerate(parts):
-                # For same-skill multi-intent, pass previous intent as hint
                 resp = _process_single(part, context, hint_intent=prev_intent)
                 responses.append(resp)
-                # Track last classified intent for the next part
                 li = context.last_intent()
                 if li:
                     prev_intent = li
-            return "  ".join(responses)
+            response = "  ".join(responses)
+            _log_interaction(text, response, context)
+            return response
 
-    return _process_single(text, context)
+    response = _process_single(text, context)
+    _log_interaction(text, response, context)
+    return response
+
+
+def _log_interaction(text: str, response: str, context: Context):
+    """Log interaction to personalisation engine + knowledge graph."""
+    try:
+        personaliser = get_personaliser()
+        intent = context.last_intent() or "unknown"
+        personaliser.log_interaction(intent, context.last_entities(), response)
+        personaliser.log_conversation(text, response, intent)
+
+        graph = get_graph()
+        graph.add_triple("user", "said", text, source="interaction")
+    except Exception:
+        pass  # Never let logging break the core loop

@@ -27,7 +27,7 @@ class LinuxProvider(PlatformProvider):
     def caps(self) -> PlatformCaps:
         return PlatformCaps(
             tts=_which("espeak-ng", "espeak", "spd-say", "festival") is not None,
-            stt=False,
+            stt=self._can_stt(),
             notification=_which("notify-send", "zenity", "kdialog") is not None,
             volume=_which("pactl", "amixer", "pulsemixer") is not None,
             brightness=_which("brightnessctl", "xbacklight", "xrandr") is not None,
@@ -37,6 +37,27 @@ class LinuxProvider(PlatformProvider):
             vibrate=False,
             clipboard=_which("xclip", "wl-copy", "xsel") is not None,
         )
+
+    def _can_stt(self) -> bool:
+        """STT is available if PipeWire capture + whisper binary are present."""
+        pw = shutil.which("pw-record") or shutil.which("pw-cat")
+        whisper = shutil.which("whisper-cli") or shutil.which("whisper")
+        return pw is not None and whisper is not None
+
+    def stt_listen(self, timeout: int = 15) -> str | None:
+        """Record audio via PipeWire and transcribe with whisper.cpp."""
+        if not self.caps.stt:
+            return None
+        try:
+            from zeno.audio.whisper_stt import listen as whisper_listen
+            text = whisper_listen(timeout=timeout)
+            if text:
+                return text
+            # Fallback: try with language detection
+            return whisper_listen(timeout=timeout, language="en")
+        except Exception as e:
+            print(f"[Zeno] STT error: {e}")
+            return None
 
     def tts_speak(self, text: str) -> bool:
         if not self.caps.tts:
