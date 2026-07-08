@@ -15,6 +15,7 @@ from zeno.core.term import (
     zeno_prefix, error_prefix, user_prefix,
     green, cyan, yellow, red, bold, dim,
 )
+from zeno.core.profile import load_profile, save_name, save_timezone, save_location, save_owm_key, save_units
 from zeno.core.context import Context
 from zeno.core.loop import process_input
 from zeno.audio.stt import listen
@@ -140,6 +141,9 @@ def _parse_slash_command(text: str) -> tuple[str | None, str, str | None]:
     if cmd == "/help":
         _print_slash_help()
         return None, "", None
+    if cmd == "/configure":
+        _run_configure_wizard()
+        return None, "", None
     if cmd == "/s" or cmd == "/search":
         return None, remainder, None  # passed as raw search
 
@@ -184,6 +188,7 @@ def _print_slash_help():
         "  /help              Show this help",
         "  /exit              Exit Zeno",
         "  /cancel            Cancel current operation",
+        "  /configure         Interactive setup wizard",
         "",
         bold("Weather"),
         "  /w [city]          Current weather",
@@ -222,6 +227,69 @@ def _print_slash_help():
     ]
     for line in lines:
         print(f"  {line}")
+
+
+# ── Configure wizard ─────────────────────────────────────────────────
+
+def _prompt(label: str, current: str | None = None, secret: bool = False) -> str | None:
+    default = f" [{current}]" if current else ""
+    prompt_text = f"  {label}{default}: "
+    try:
+        val = input(prompt_text).strip()
+    except (EOFError, KeyboardInterrupt):
+        print()
+        return None
+    if not val:
+        return current
+    return val
+
+
+def _run_configure_wizard():
+    profile = load_profile()
+    print(f"\n  {bold('Zeno Configuration Wizard')}")
+    print(f"  {dim('Press Enter to keep current value, Ctrl+C to cancel')}\n")
+
+    name = _prompt("Your name", profile.name)
+    if name is None:
+        return
+    if name != profile.name:
+        save_name(name)
+
+    location = _prompt("Your city/location", profile.location)
+    if location is None:
+        return
+    if location != profile.location:
+        save_location(location)
+
+    tz = _prompt("Timezone (e.g. America/New_York, Europe/London)", profile.timezone)
+    if tz is None:
+        return
+    if tz != profile.timezone:
+        save_timezone(tz)
+
+    units = _prompt("Units (celsius/fahrenheit)", profile.units or "celsius")
+    if units is None:
+        return
+    units = units.lower().strip()
+    if units not in ("celsius", "fahrenheit"):
+        units = "celsius"
+    if units != profile.units:
+        save_units(units)
+
+    owm = _prompt("OpenWeatherMap API key (blank = use sponsored key)", "set" if profile.owm_api_key else None)
+    if owm is None:
+        return
+    if owm and owm != "set":
+        save_owm_key(owm)
+
+    updated = load_profile()
+    print(f"\n  {green('Configuration saved!')}")
+    print(f"  Name:     {bold(updated.name or '(not set)')}")
+    print(f"  Location: {bold(updated.location or '(not set)')}")
+    print(f"  Timezone: {bold(updated.timezone or '(not set)')}")
+    print(f"  Units:    {bold(updated.units)}")
+    print(f"  OWM key:  {bold('set' if updated.owm_api_key else 'sponsored fallback')}")
+    print()
 
 
 # ── Shorthand syntax ─────────────────────────────────────────────────
