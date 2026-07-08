@@ -1,0 +1,60 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zeno"
+version = "1.0.0"
+description = "On-device voice assistant — semantic NLU, cross-platform, zero cloud"
+readme = "README.md"
+license = {text = "MIT"}
+authors = [
+    {name = "The Architect"},
+]
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+web = [
+    "fastapi>=0.99,<1",
+    "uvicorn[standard]",
+    "websockets",
+]
+weather = [
+    "httpx",
+]
+tui = [
+    "textual>=0.41",
+]
+voice-desktop = [
+    # Optional, higher-quality local TTS/STT engines. All are pure pip
+    # installs (no external binaries required) but faster-whisper and
+    # kokoro-onnx don't build on Termux (Android/bionic libc) — install
+    # this extra on desktop Linux/macOS/Windows only. Piper also works
+    # via a standalone 'piper' binary if you'd rather not pip-install it.
+    "piper-tts",
+    "kokoro-onnx",
+    "faster-whisper",
+    "openwakeword",
+]
+nlu-semantic = [
+    # Optional embedding-based tie-breaker for the NLU classifier (see
+    # zeno/nlu/embeddings.py). Pure ONNX Runtime CPU inference — no
+    # torch, no transformers. Only ever consulted when the built-in
+    # n-gram classifier's own confidence is already low.
+    "onnxruntime",
+    "tokenizers",
+]
+test = [
+    "pytest",
+    "httpx",
+]
+
+[project.scripts]
+zeno = "zeno.__main__:main"
+
+[tool.setuptools.packages.find]
+include = ["zeno*"]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
