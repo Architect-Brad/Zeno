@@ -22,6 +22,22 @@ _IPAPI_URL = "https://ipapi.co/json/"
 _OWM_URL = "https://api.openweathermap.org/data/2.5/weather?q={city}&appid={key}&units={unit}"
 _OWM_FORECAST_URL = "https://api.openweathermap.org/data/2.5/forecast?q={city}&appid={key}&units={unit}&cnt=5"
 
+# Sponsored OpenWeatherMap API key — publicly shared by The Architect
+# so Zeno works out of the box. Override with ZENO_OWM_API_KEY env var
+# or configure your own via /configure or the web dashboard.
+_SPONSORED_OWM_KEY = "b0a222e3b34a6a08223814fc7229e450"
+
+
+def _resolve_owm_key(profile_key: str | None) -> str | None:
+    import os
+    env_key = os.environ.get("ZENO_OWM_API_KEY")
+    if env_key:
+        return env_key
+    if profile_key:
+        return profile_key
+    return _SPONSORED_OWM_KEY
+
+
 # WMO weather code → English description
 _WMO_CODES: dict[int, str] = {
     0: "clear sky", 1: "mainly clear", 2: "partly cloudy", 3: "overcast",
@@ -201,7 +217,7 @@ class WeatherSkill(BaseSkill):
         profile = load_profile()
         city = entities.location or profile.location or None
         unit = profile.units or "celsius"
-        owm_key = profile.owm_api_key
+        owm_key = _resolve_owm_key(profile.owm_api_key)
 
         lat, lon, resolved_city = None, None, None
         if city:
