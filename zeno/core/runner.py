@@ -10,6 +10,7 @@ import os
 import re
 import sys
 from pathlib import Path
+from threading import Event
 
 from zeno.core.term import (
     zeno_prefix, error_prefix, user_prefix,
@@ -355,6 +356,22 @@ async def listen_async(timeout: int = 15) -> str | None:
     return await loop.run_in_executor(None, listen, timeout)
 
 
+async def listen_vad_async(stop: Event) -> str | None:
+    """Listen for a complete utterance using VAD, transcribe via whisper."""
+    from zeno.audio.vad import listen_continuous
+    from zeno.audio.whisper_stt import transcribe_file
+    loop = asyncio.get_running_loop()
+    wav_path = await loop.run_in_executor(None, listen_continuous, 30.0, stop)
+    if not wav_path:
+        return None
+    try:
+        text = await loop.run_in_executor(None, transcribe_file, wav_path)
+        return text
+    finally:
+        if os.path.exists(wav_path):
+            os.unlink(wav_path)
+
+
 async def speak_async(text: str) -> bool:
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, speak, text)
@@ -401,6 +418,29 @@ async def run_voice_interaction(context: Context,
     response = process_input(text, context)
     await speak_async(response)
     return response
+
+
+async def run_vad_continuous_loop():
+    """Voice loop with VAD-based continuous listening — no wake word needed."""
+    context = Context()
+    stop = Event()
+    print(f"{zeno_prefix()} Continuous voice mode {dim('(VAD)')}. {dim('Ctrl+C to exit.')}")
+    sys.stdout.flush()
+
+    while True:
+        try:
+            text = await listen_vad_async(stop)
+            if not text:
+                continue
+            response = process_input(text, context)
+            await speak_async(response)
+        except (EOFError, KeyboardInterrupt):
+            stop.set()
+            print(f"\n{zeno_prefix()} Goodbye!")
+            break
+        except Exception as e:
+            print(f"{error_prefix()} {e}")
+            continue
 
 
 async def run_voice_loop(require_wake: bool = False, native_wake: bool = False):
@@ -662,7 +702,9 @@ def main():
         run_tui()
         sys.exit(0)
 
-    if args.continuous or args.voice or args.wake or args.native_wake:
+    if args.continuous:
+        asyncio.run(run_vad_continuous_loop())
+    elif args.voice or args.wake or args.native_wake:
         asyncio.run(run_voice_loop(
             require_wake=args.wake or args.native_wake,
             native_wake=args.native_wake,
